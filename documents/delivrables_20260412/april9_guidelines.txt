@@ -1,0 +1,19 @@
+Case #3 guidelines :
+
+What you must bring:
+
+Your intermediary deliverable (three out-of-the-box product ideas) is due April 19 — but the thinking must be substantially done by April 10. Come with all three ideas in a presentable state: market sizing, feasibility note, and pricing hypothesis for each. Be ready to defend why each idea is genuinely new, i.e. not a repackaging of what L'Étudiant already does.
+
+Beyond the ideation, bring a working data pipeline for at least one product direction. This means a real notebook or dbt model — running on the sandbox data — that takes a source table, applies a transformation (segmentation, scoring, or enrichment), and outputs an activation-ready table. A slide describing what the pipeline would do is not acceptable. The code must exist and run.
+
+Also bring a first version of the lead scoring model: a Python notebook that reads from the BigQuery sandbox, applies a scoring logic across at least three dimensions (freshness, intention clarity, data completeness), and outputs a classified lead table with A/B/C labels. Bring sample outputs you can show the team.
+
+
+
+What the L'Étudiant team will examine:
+
+They will look at the pipeline output directly — expect them to ask about data quality, edge cases, and how the model handles missing fields. They will challenge your three product ideas against their existing commercial reality: is there a real client who would pay for this, at this price? They will probe your scoring dimensions: are these the right signals, or are you missing something that L'Étudiant's commercial team already knows matters?
+
+
+
+The bar: leave with one product direction validated as the priority, and with specific technical feedback on the pipeline and scoring model that you can act on before May 6.

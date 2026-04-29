@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>L'Étudiant Data Products</title>
+
+<style>
+    body {
+        font-family: Arial;
+        background: #f4f6f9;
+        padding: 30px;
+    }
+
+    h1 { color: #2c3e50; }
+
+    button {
+        padding: 12px 20px;
+        margin: 10px 10px 20px 0;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn1 { background: #3498db; color: white; }
+    .btn2 { background: #27ae60; color: white; }
+    .btn3 { background: #e67e22; color: white; }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-top: 20px;
+        background: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th { background: #ecf0f1; }
+
+    .A { color: green; font-weight: bold; }
+    .B { color: orange; font-weight: bold; }
+    .C { color: red; font-weight: bold; }
+</style>
+</head>
+
+<body>
+
+<h1>🎓 L'Étudiant — Data Product Demo</h1>
+
+<button class="btn1" onclick="loadData()">1️⃣ Charger les données</button>
+<button class="btn2" onclick="product1()">2️⃣ Produit 1 — Top Leads</button>
+<button class="btn3" onclick="product3()">3️⃣ Produit 3 — No-Shows</button>
+
+<div id="output"></div>
+
+<script>
+
+let data = [];
+
+// Load CSV
+async function loadData() {
+    const response = await fetch("activation_ready_leads.csv");
+    const text = await response.text();
+
+    const rows = text.split("\n").slice(1); // skip header
+
+    data = rows
+        .filter(row => row.trim() !== "")
+        .map(row => {
+            const cols = row.split(",");
+
+            return {
+                id: cols[0],
+                lead_class: cols[1],
+                score: parseFloat(cols[2]),
+                freshness: parseFloat(cols[3]),
+                intent: parseFloat(cols[4]),
+                completeness: parseFloat(cols[5]),
+                life_moment: cols[6],
+                recency: cols[7],
+                field: cols[8],
+                level: cols[9],
+                region: cols[10],
+                age: cols[11],
+                email: cols[12],
+                phone: cols[13],
+                no_show: cols[14] === "True"
+            };
+        });
+
+    displayTable(data.slice(0, 15), "📥 Raw Activation Data (Sample)");
+}
+
+// Product 1
+function product1() {
+    let topLeads = data
+        .filter(d => d.lead_class === "A")
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 15);
+
+    displayTable(topLeads, "🚀 Produit 1 — High Intent Leads");
+}
+
+// Product 3
+function product3() {
+    let noShows = data
+        .filter(d => d.no_show === true)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 15);
+
+    displayTable(noShows, "🔍 Produit 3 — No-Show Recovery");
+}
+
+// Display
+function displayTable(dataset, title) {
+    let html = `<h2>${title}</h2><table>
+        <tr>
+            <th>ID</th>
+            <th>Score</th>
+            <th>Class</th>
+            <th>Life Moment</th>
+            <th>No Show</th>
+        </tr>`;
+
+    dataset.forEach(d => {
+        html += `
+        <tr>
+            <td>${d.id}</td>
+            <td>${d.score}</td>
+            <td class="${d.lead_class}">${d.lead_class}</td>
+            <td>${d.life_moment}</td>
+            <td>${d.no_show ? "⚠️ Yes" : "No"}</td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    document.getElementById("output").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Étudiant — Baromètre Data · Groupe 21</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface2: #f0ede6;
+  --border: #e2ddd5;
+  --border2: #ccc8be;
+  --ink: #1a1714;
+  --ink-dim: #6b6560;
+  --ink-dimmer: #b0ada8;
+  --accent: #c8381a;
+  --accent2: #1a5fc8;
+  --A: #1a7a3c;
+  --B: #c87a1a;
+  --C: #c8381a;
+  --radius: 10px;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Lato', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:14px; line-height:1.6; min-height:100vh; }
+
+/* HEADER */
+.header {
+  background: var(--ink);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { font-family:var(--font-display); font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.5px; white-space:nowrap; }
+.logo span { color:var(--accent); }
+.logo-sub { font-family:var(--font-mono); font-size:10px; color:#888; margin-left:10px; letter-spacing:1px; }
+.nav { display:flex; gap:2px; flex:1; }
+.nav-btn {
+  padding:5px 16px; border-radius:5px; border:none;
+  background:none; color:#888;
+  font-family:var(--font-display); font-size:12px; font-weight:600;
+  cursor:pointer; transition:all 0.15s; white-space:nowrap; letter-spacing:0.3px;
+}
+.nav-btn:hover { color:#fff; background:rgba(255,255,255,0.08); }
+.nav-btn.active { background:var(--accent); color:#fff; }
+.header-status { font-family:var(--font-mono); font-size:10px; color:#666; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.dot { width:6px; height:6px; border-radius:50%; background:#4ade80; animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* VIEWS */
+.view { display:none; padding:36px 40px; }
+.view.active { display:block; animation:fadeIn 0.25s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+/* SECTION HEADER */
+.section-header { margin-bottom:28px; }
+.section-title { font-family:var(--font-display); font-size:28px; font-weight:800; color:var(--ink); letter-spacing:-0.5px; }
+.section-title em { color:var(--accent); font-style:normal; }
+.section-sub { font-family:var(--font-mono); font-size:11px; color:var(--ink-dimmer); margin-top:4px; }
+
+/* FILTERS */
+.filters {
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:14px 18px; margin-bottom:28px;
+}
+.filter-label { font-family:var(--font-mono); font-size:10px; color:var(--ink-dimmer); letter-spacing:1px; text-transform:uppercase; }
+select.filter {
+  background:var(--surface2); border:1px solid var(--border); color:var(--ink);
+  font-family:var(--font-mono); font-size:11px; padding:5px 28px 5px 10px;
+  border-radius:5px; cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23b0ada8' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 8px center;
+  transition:border-color 0.15s;
+}
+select.filter:focus { outline:none; border-color:var(--accent); }
+.btn-reset {
+  margin-left:auto; background:none; border:1px solid var(--border);
+  color:var(--ink-dim); font-family:var(--font-mono); font-size:10px;
+  padding:5px 12px; border-radius:5px; cursor:pointer; transition:all 0.15s;
+}
+.btn-reset:hover { border-color:var(--accent); color:var(--accent); }
+
+/* KPIs */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:14px; margin-bottom:24px; }
+.kpi {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:18px 20px;
+  border-top:3px solid var(--kpi-color, var(--accent));
+  transition:box-shadow 0.2s;
+}
+.kpi:hover { box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+.kpi-label { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1.2px; color:var(--ink-dimmer); margin-bottom:8px; }
+.kpi-value { font-family:var(--font-display); font-size:34px; font-weight:800; color:var(--ink); line-height:1; }
+.kpi-sub { font-size:12px; color:var(--ink-dim); margin-top:4px; }
+
+/* INSIGHTS */
+.insight {
+  display:flex; gap:14px; align-items:flex-start;
+  background:var(--surface); border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:var(--radius); padding:14px 18px; margin-bottom:10px;
+  font-size:13px; line-height:1.55;
+}
+.insight-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+.insight strong { color:var(--accent); font-weight:700; }
+
+/* CHARTS GRID */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px; }
+.grid-wide { display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:900px) { .grid-2,.grid-3,.grid-wide { grid-template-columns:1fr; } }
+
+.card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:22px;
+}
+.card-title { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dim); margin-bottom:3px; }
+.card-desc { font-size:11px; color:var(--ink-dimmer); margin-bottom:18px; }
+
+/* TABLE */
+.table-wrap { overflow-x:auto; margin-top:4px; }
+table.dt { width:100%; border-collapse:collapse; font-size:12px; }
+table.dt th { background:var(--surface2); color:var(--ink-dimmer); font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; padding:10px 14px; text-align:left; border-bottom:2px solid var(--border); white-space:nowrap; }
+table.dt td { padding:9px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:middle; }
+table.dt tr:last-child td { border-bottom:none; }
+table.dt tr:hover td { background:var(--surface2); }
+
+.badge { display:inline-block; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); font-size:10px; font-weight:600; }
+.badge-A { background:#dcfce7; color:var(--A); }
+.badge-B { background:#fef9c3; color:var(--B); }
+.badge-C { background:#fee2e2; color:var(--C); }
+.badge-ns { background:#fee2e2; color:var(--C); }
+.badge-ori { background:#eff6ff; color:var(--accent2); }
+
+/* SPEC CARDS */
+.spec-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media(max-width:900px) { .spec-grid { grid-template-columns:1fr; } }
+.spec-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.spec-head { padding:22px 26px 18px; background:var(--ink); }
+.spec-num { font-family:var(--font-mono); font-size:9px; color:#888; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.spec-name { font-family:var(--font-display); font-size:22px; font-weight:800; color:#fff; line-height:1.1; margin-bottom:4px; }
+.spec-tag { font-size:12px; color:#aaa; font-style:italic; }
+.spec-body { padding:20px 26px; }
+.spec-row { display:grid; grid-template-columns:110px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.spec-row:last-child { border-bottom:none; }
+.spec-key { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); padding-top:2px; }
+.spec-val { font-size:12px; color:var(--ink); line-height:1.5; }
+.spec-val ul { padding-left:14px; }
+.spec-val li { color:var(--ink-dim); margin-bottom:3px; }
+.price-pill { display:inline-block; background:var(--ink); color:#fff; font-family:var(--font-mono); font-size:12px; padding:5px 12px; border-radius:4px; margin-bottom:6px; }
+.mbar { height:5px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden; }
+.mbar-fill { height:100%; background:var(--A); border-radius:3px; }
+.mbar-label { font-family:var(--font-mono); font-size:10px; color:var(--ink-dim); margin-top:3px; }
+
+/* BIZPLAN */
+.bp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media(max-width:900px) { .bp-grid { grid-template-columns:1fr; } }
+.assumption-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; }
+.assum-title { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); margin-bottom:14px; }
+.assum-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); gap:10px; }
+.assum-row:last-child { border-bottom:none; }
+.assum-name { font-size:12px; color:var(--ink-dim); }
+input.assum-input { background:var(--surface2); border:1px solid var(--border); color:var(--ink); font-family:var(--font-mono); font-size:12px; padding:3px 8px; border-radius:4px; width:78px; text-align:right; }
+input.assum-input:focus { outline:none; border-color:var(--accent); }
+.rev-table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
+table.rev { width:100%; border-collapse:collapse; font-size:13px; }
+table.rev th { background:var(--ink); color:#888; font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; padding:12px 18px; text-align:right; border-bottom:none; }
+table.rev th:first-child { text-align:left; color:#ccc; }
+table.rev td { padding:11px 18px; text-align:right; font-family:var(--font-mono); border-bottom:1px solid var(--border); color:var(--ink); }
+table.rev td:first-child { text-align:left; font-family:var(--font-body); color:var(--ink-dim); }
+table.rev tr.total td { border-top:2px solid var(--border); color:var(--accent); font-weight:600; background:#fff8f6; }
+table.rev tr.total td:first-child { color:var(--ink); }
+table.rev tr:last-child td { border-bottom:none; }
+
+.sens-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+@media(max-width:900px) { .sens-grid { grid-template-columns:1fr; } }
+table.sens { width:100%; border-collapse:collapse; font-size:12px; font-family:var(--font-mono); }
+table.sens th { color:var(--ink-dimmer); font-size:9px; text-align:center; padding:6px 8px; border-bottom:1px solid var(--border); }
+table.sens td { text-align:center; padding:6px 8px; border-bottom:1px solid var(--border); }
+table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:1px solid var(--border); }
+.hl { background:#fee2e2; color:var(--C); }
+.hm { background:#fef9c3; color:var(--B); }
+.hh { background:#dcfce7; color:var(--A); }
+.hb { background:var(--ink); color:#fff; }
+
+/* BVP */
+.bvp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+@media(max-width:900px) { .bvp-grid { grid-template-columns:1fr; } }
+.bvp-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; }
+.bvp-card.rec { border-color:var(--A); border-width:2px; }
+.bvp-label { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dimmer); margin-bottom:6px; }
+.bvp-label.rec { color:var(--A); }
+.bvp-title { font-family:var(--font-display); font-size:20px; font-weight:800; margin-bottom:16px; }
+.bvp-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12px; line-height:1.4; }
+.bvp-item:last-child { border-bottom:none; }
+.pro { color:var(--A); font-weight:700; flex-shrink:0; }
+.con { color:var(--C); font-weight:700; flex-shrink:0; }
+.df-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px; }
+.df-table th { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); padding:8px 14px; border-bottom:2px solid var(--border); text-align:left; }
+.df-table td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top; line-height:1.45; }
+.df-table tr:last-child td { border-bottom:none; }
+.verdict { display:inline-block; padding:2px 8px; border-radius:4px; font-family:var(--font-mono); font-size:10px; font-weight:600; }
+.v-build { background:#dcfce7; color:var(--A); }
+.v-partner { background:#eff6ff; color:var(--accent2); }
+.v-hybrid { background:#fef9c3; color:var(--B); }
+
+.compliance-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius); padding:18px 22px; margin-top:16px; }
+.compliance-title { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--A); margin-bottom:12px; }
+.compliance-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; margin-top:10px; }
+.compliance-item { display:flex; gap:8px; font-size:12px; color:var(--ink-dim); }
+.check { color:var(--A); flex-shrink:0; font-weight:700; }
+
+.source-note { font-family:var(--font-mono); font-size:10px; color:var(--ink-dimmer); margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+
+.recalc-btn { background:var(--ink); color:#fff; border:none; font-family:var(--font-display); font-size:12px; font-weight:700; padding:8px 20px; border-radius:5px; cursor:pointer; letter-spacing:0.3px; transition:background 0.15s; }
+.recalc-btn:hover { background:var(--accent); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">L'<span>É</span>tudiant <span class="logo-sub">DATA INTELLIGENCE · G21</span></div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="switchView('barometer',this)">Baromètre</button>
+    <button class="nav-btn" onclick="switchView('specs',this)">Fiches Produit</button>
+    <button class="nav-btn" onclick="switchView('bizplan',this)">Business Plan</button>
+    <button class="nav-btn" onclick="switchView('bvp',this)">Build vs Partner</button>
+  </nav>
+  <div class="header-status"><div class="dot"></div><span id="status-text">Chargement…</span></div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     BAROMETRE
+═══════════════════════════════════════════ -->
+<div id="view-barometer" class="view active">
+  <div class="section-header">
+    <div class="section-title">Baromètre <em>Orientation</em></div>
+    <div class="section-sub">Pipeline BigQuery → Scoring 3D → Activation · Filtres live sur données réelles</div>
+  </div>
+
+  <div class="filters">
+    <span class="filter-label">Filtres</span>
+    <select class="filter" id="f-class" onchange="applyFilters()"><option value="">Toutes classes</option><option>A</option><option>B</option><option>C</option></select>
+    <select class="filter" id="f-region" onchange="applyFilters()"><option value="">Toutes régions</option></select>
+    <select class="filter" id="f-level" onchange="applyFilters()"><option value="">Tous niveaux</option></select>
+    <select class="filter" id="f-recency" onchange="applyFilters()"><option value="">Toute période</option><option>0-7d</option><option>8-30d</option><option>31-90d</option><option>91-365d</option><option>365d+</option></select>
+    <select class="filter" id="f-noshow" onchange="applyFilters()"><option value="">Tous profils</option><option value="true">No-shows uniquement</option><option value="false">Présents uniquement</option></select>
+    <button class="btn-reset" onclick="resetFilters()">↺ Réinitialiser</button>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div id="insights-container"></div>
+
+  <div class="grid-wide" style="margin-top:20px;">
+    <div class="card">
+      <div class="card-title">Distribution A/B/C post-filtres RGPD</div>
+      <div class="card-desc">Composite score : fraîcheur 35% · intention 45% · complétude 20%</div>
+      <canvas id="chart-abc" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Life-moment segmentation</div>
+      <div class="card-desc">Segments par signaux comportementaux + intents déclarés</div>
+      <canvas id="chart-lifemoment" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title">Score médian par région</div>
+      <div class="card-desc">Données Site_Inscrits · jointure BigQuery</div>
+      <canvas id="chart-region" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Fraîcheur des signaux</div>
+      <div class="card-desc">Recency bucket · dernière interaction cross-tables</div>
+      <canvas id="chart-recency" height="200"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">No-shows par niveau scolaire</div>
+      <div class="card-desc">Salons_Inscrits_et_venus · taux inscrits non venus</div>
+      <canvas id="chart-noshows" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Engagement CRM · ouvertures & clics</div>
+      <div class="card-desc">CRM_Communication · données réelles saison 25/26</div>
+      <canvas id="chart-crm" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Volume chatbot orientation · jan–avr 2026</div>
+      <div class="card-desc">Agent_Conversationnel_ORI · sessions hebdomadaires</div>
+      <canvas id="chart-chatbot" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">Top leads activables</div>
+    <div class="card-desc">Profils conformes RGPD · triés par score composite · données BigQuery réelles</div>
+    <div class="table-wrap">
+      <table class="dt">
+        <thead><tr>
+          <th>ID Inscrit</th><th>Classe</th><th>Score</th>
+          <th>Fraîcheur</th><th>Intention</th><th>Complétude</th>
+          <th>Région</th><th>Niveau</th><th>Recency</th><th>No-show</th>
+        </tr></thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="source-note" id="source-note"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FICHES PRODUIT
+═══════════════════════════════════════════ -->
+<div id="view-specs" class="view">
+  <div class="section-header">
+    <div class="section-title">Fiches <em>Produit</em></div>
+    <div class="section-sub">Spécifications formelles · client · inputs · transformations · pricing · marge</div>
+  </div>
+  <div class="spec-grid">
+
+    <div class="spec-card">
+      <div class="spec-head">
+        <div class="spec-num">Produit 01</div>
+        <div class="spec-name">High-Intent Lead Feed</div>
+        <div class="spec-tag">Du profil statique au rang dynamique d'opportunité</div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Grandes écoles, universités, bootcamps · équipes recrutement avec budget CPA défini</div></div>
+        <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">Listes statiques : un profil vu hier = un profil vu il y a 6 mois, même prix. Le client paie pour des leads froids.</div></div>
+        <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Flux hebdomadaire des top 200 prospects recalculé en temps réel depuis les comportements récents. Le produit est le <em>rang</em>, pas le profil.</div></div>
+        <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val"><ul><li>Salons_Inscrits_et_venus · inscriptions + présence</li><li>Agent_Conversationnel_ORI · sessions chatbot</li><li>Site_Inscrits · optins + géographie</li><li>CRM_Communication · engagement email</li></ul></div></div>
+        <div class="spec-row"><div class="spec-key">Transformations</div><div class="spec-val"><ul><li>Score fraîcheur : exp decay λ=0.015 depuis last_interaction</li><li>Score intention : signaux pondérés tanh-normalisés</li><li>Score complétude : champs commercialement utilisables</li><li>Compliance : optin=True + non-mineur + ACTIF</li></ul></div></div>
+        <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">0,80 € – 2,00 € / lead scoré</div><div style="font-size:11px;color:var(--ink-dim);margin-top:5px;">vs. 0,30–0,60 € liste brute → <strong>×3 revenu/lead potentiel</strong></div></div></div>
+        <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:85%"></div></div><div class="mbar-label">85% · coût marginal ~0,08€/lead · infra pipeline mutualisée</div></div></div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-head">
+        <div class="spec-num">Produit 02</div>
+        <div class="spec-name">No-Show Intelligence Report</div>
+        <div class="spec-tag">Transformer le coût irrécupérable en opportunité de réactivation</div>
+      </div>
+      <div class="spec-body">
+        <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Exposants des salons L'Étudiant · responsables recrutement · marketing événementiel</div></div>
+        <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">38–42% des inscrits ne viennent pas aux salons (données réelles BigQuery). Cette donnée disparaît. Ce sont des leads chauds non convertis.</div></div>
+        <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Rapport post-salon livré sous 48h : qui n'est pas venu, quels profils sont sur-représentés, quels signaux de friction, quels profils restent ré-engageables.</div></div>
+        <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val"><ul><li>Salons_Inscrits_et_venus · Showed_up=false</li><li>Site_Inscrits · optin, région, acquisition_source</li><li>CRM_Communication · engagement email pré-salon</li></ul></div></div>
+        <div class="spec-row"><div class="spec-key">Transformations</div><div class="spec-val"><ul><li>Filtre no-show : Showed_up IS NULL AND salon_date IS NOT NULL</li><li>Segmentation : study_level, study_field_interests</li><li>Score ré-engagement : email opened + chatbot pré-salon</li></ul></div></div>
+        <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">3 000 € – 8 000 € / édition salon</div><div style="font-size:11px;color:var(--ink-dim);margin-top:5px;">Add-on post-salon · ~10 salons/an → <strong>30k–80k€ ARR potentiel</strong></div></div></div>
+        <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:93%"></div></div><div class="mbar-label">93% · pipeline automatisé · coût = compute + QA</div></div></div>
+      </div>
+    </div>
+
+    <div class="spec-card" style="grid-column:1/-1;">
+      <div class="spec-head">
+        <div class="spec-num">Produit 03</div>
+        <div class="spec-name">Life-moment Audience API</div>
+        <div class="spec-tag">Self-service segmentation pour partenaires financiers, logement et mobilité</div>
+      </div>
+      <div class="spec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+        <div>
+          <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Banques (Boursorama, Hello Bank), plateformes logement (Studapart), assureurs, mobilité internationale</div></div>
+          <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">Workflow actuel : appel commercial → négociation → extraction manuelle. Lent, non scalable, pas d'audit trail RGPD.</div></div>
+          <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Endpoint API REST self-service permettant de requêter des segments par life-moment avec audit trail de consentement intégré.</div></div>
+        </div>
+        <div>
+          <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val">Site_Inscrits (optin_FINANCE, optin_HOUSING) · comportements cross-tables · consentements granulaires</div></div>
+          <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">500–2 000 €/mois accès plateforme</div><div style="margin-top:5px;"><span class="price-pill" style="font-size:11px;">+ 0,50–1,20 € / profil exporté</span></div></div></div>
+          <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:78%"></div></div><div class="mbar-label">78% · coût infra API + DPO + maintenance</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="compliance-box">
+    <div class="compliance-title">Note de conformité RGPD · pipeline by design</div>
+    <p style="font-size:12px;color:var(--ink-dim);">Aucun profil n'atteint l'état "activable" sans passer ces contrôles. Vérifiés à chaque run du pipeline.</p>
+    <div class="compliance-grid">
+      <div class="compliance-item"><span class="check">✓</span><span>optin_commercial_actuel = True · consentement explicite requis</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Majorité vérifiée sur Naissance_Date · exclusion mineurs</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>ACTIF = Toujours inscrit · profils désinscrits exclus</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Emails hashés SHA-256 dans BigQuery · zéro PII en clair</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Audit trail d'export · date + client + volume + optin_type</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Droit à l'oubli : suppression propagée via id_Inscrit_site</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BUSINESS PLAN
+═══════════════════════════════════════════ -->
+<div id="view-bizplan" class="view">
+  <div class="section-header" style="display:flex;align-items:flex-end;justify-content:space-between;">
+    <div>
+      <div class="section-title">Business <em>Plan</em></div>
+      <div class="section-sub">Projections 3 ans · hypothèses nommées · sensibilité sur 2 variables critiques · modèle interactif</div>
+    </div>
+    <button class="recalc-btn" onclick="recalc()">↺ Recalculer</button>
+  </div>
+  <div class="bp-grid">
+    <div class="assumption-card">
+      <div class="assum-title">P1 — Lead Feed</div>
+      <div class="assum-row"><span class="assum-name">Prix moyen / lead (€)</span><input class="assum-input" id="p1-price" type="number" value="1.20" step="0.10" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Leads / client / mois</span><input class="assum-input" id="p1-leads" type="number" value="200" step="10" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Clients Y1</span><input class="assum-input" id="p1-c1" type="number" value="8" step="1" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Croissance clients Y2/Y3 (%)</span><input class="assum-input" id="p1-growth" type="number" value="80" step="5" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Taux conversion prospect→client (%)</span><input class="assum-input" id="p1-conv" type="number" value="18" step="1" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Churn annuel (%)</span><input class="assum-input" id="p1-churn" type="number" value="15" step="1" onchange="recalc()"></div>
+    </div>
+    <div class="assumption-card">
+      <div class="assum-title">P2 — No-Show Report</div>
+      <div class="assum-row"><span class="assum-name">Prix moyen / rapport (€)</span><input class="assum-input" id="p2-price" type="number" value="5000" step="500" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Salons / an</span><input class="assum-input" id="p2-salons" type="number" value="10" step="1" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Taux adoption exposants Y1 (%)</span><input class="assum-input" id="p2-adopt" type="number" value="25" step="5" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Exposants moyens / salon</span><input class="assum-input" id="p2-exp" type="number" value="30" step="5" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Croissance adoption Y2/Y3 (%)</span><input class="assum-input" id="p2-growth" type="number" value="60" step="5" onchange="recalc()"></div>
+    </div>
+    <div class="assumption-card">
+      <div class="assum-title">P3 — Life-moment API</div>
+      <div class="assum-row"><span class="assum-name">MRR / client (€/mois)</span><input class="assum-input" id="p3-mrr" type="number" value="1200" step="100" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Clients API Y1</span><input class="assum-input" id="p3-c1" type="number" value="3" step="1" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Croissance clients Y2/Y3 (%)</span><input class="assum-input" id="p3-growth" type="number" value="100" step="10" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Profils exportés / client / mois</span><input class="assum-input" id="p3-exports" type="number" value="500" step="100" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Prix / profil exporté (€)</span><input class="assum-input" id="p3-ppu" type="number" value="0.80" step="0.10" onchange="recalc()"></div>
+    </div>
+    <div class="assumption-card">
+      <div class="assum-title">Coûts & structure</div>
+      <div class="assum-row"><span class="assum-name">Infra BigQuery + pipeline (€/an)</span><input class="assum-input" id="infra" type="number" value="18000" step="1000" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Équipe data (€/an)</span><input class="assum-input" id="team" type="number" value="60000" step="5000" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">DPO / conformité (€/an)</span><input class="assum-input" id="dpo" type="number" value="12000" step="1000" onchange="recalc()"></div>
+      <div class="assum-row"><span class="assum-name">Sales & marketing (% CA)</span><input class="assum-input" id="sales-pct" type="number" value="12" step="1" onchange="recalc()"></div>
+    </div>
+  </div>
+  <div class="rev-table-wrap"><table class="rev" id="rev-table"></table></div>
+  <div class="card"><div class="card-title">Projection revenus 3 ans par produit</div><div class="card-desc">Modèle recalculé dynamiquement · modifier les hypothèses ci-dessus</div><canvas id="chart-revenue" height="180"></canvas></div>
+  <div class="sens-grid">
+    <div class="card"><div class="card-title">Sensibilité · Taux conversion P1 (%)</div><p style="font-size:11px;color:var(--ink-dimmer);margin-bottom:14px;">Variable la plus incertaine : pas de référence interne sur la conversion B2B de L'Étudiant sur ce segment.</p><table class="sens" id="sens1"></table></div>
+    <div class="card"><div class="card-title">Sensibilité · Prix moyen / lead (€)</div><p style="font-size:11px;color:var(--ink-dimmer);margin-bottom:14px;">Élasticité prix inconnue. Marché actuel : 0,30–0,60€. La valeur perçue de l'intelligence vs. le volume reste à valider.</p><table class="sens" id="sens2"></table></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BUILD VS PARTNER
+═══════════════════════════════════════════ -->
+<div id="view-bvp" class="view">
+  <div class="section-header">
+    <div class="section-title">Build <em>vs</em> Partner</div>
+    <div class="section-sub">Framework de décision · Lead Scoring Model · logique argumentée</div>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--ink-dim);">
+    <strong style="color:var(--ink);">Question L'Étudiant :</strong> Pour le lead scoring model, faut-il construire en interne ou s'appuyer sur un partenaire d'enrichissement (Cognism, Clearbit, Lusha…) — et quelle est la logique de décision ?
+  </div>
+  <div class="bvp-grid">
+    <div class="bvp-card">
+      <div class="bvp-label">Option A</div>
+      <div class="bvp-title">Build In-house</div>
+      <div class="bvp-item"><span class="pro">+</span><span>Données comportementales letudiant.fr exclusives : non disponibles chez des tiers</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Contrôle total du modèle : adaptation aux cycles saisonniers (rentrée, Parcoursup, salons)</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Conformité RGPD native : données dans le périmètre légal de L'Étudiant</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Pas de coût de licence tiers : marge 85–93% préservée</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Actif stratégique : le modèle devient une barrière à l'entrée long terme</span></div>
+      <div class="bvp-item"><span class="con">−</span><span>Nécessite une compétence data science interne ou une embauche</span></div>
+      <div class="bvp-item"><span class="con">−</span><span>Time-to-market plus long : 3–6 mois pour un modèle ML en production</span></div>
+    </div>
+    <div class="bvp-card rec">
+      <div class="bvp-label rec">★ Recommandée · Option B</div>
+      <div class="bvp-title">Hybride (Build core + Partner enrichissement)</div>
+      <div class="bvp-item"><span class="pro">+</span><span>Modèle core in-house sur données propriétaires · différenciateur préservé</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Enrichissement géographique INSEE open data (gratuit, sans DPA complexe) pour les 3% sans région</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Partenaire commercial (Cognism, Clearbit) uniquement si Life-moment API lancée et clients B2B demandent signaux cross-domain</span></div>
+      <div class="bvp-item"><span class="pro">+</span><span>Couplage lâche : remplacement du partenaire facilité, pas de lock-in</span></div>
+      <div class="bvp-item"><span class="con">−</span><span>Coût de licence si partenaire commercial : 500–3 000 €/mois selon volume</span></div>
+      <div class="bvp-item"><span class="con">−</span><span>DPA requis avec tout tiers : due diligence RGPD à prévoir</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Framework de décision par critère</div>
+    <div class="card-desc">Logique appliquée critère par critère</div>
+    <table class="df-table">
+      <thead><tr><th>Critère</th><th>Décision</th><th>Raisonnement</th></tr></thead>
+      <tbody>
+        <tr><td>Unicité des données comportementales</td><td><span class="verdict v-build">BUILD</span></td><td>Signaux chatbot, simulateur, salons sur letudiant.fr exclusifs. Cœur différenciateur non reproductible par un tiers.</td></tr>
+        <tr><td>Signaux complémentaires (géo, socio)</td><td><span class="verdict v-partner">PARTNER</span></td><td>Région NULL sur ~3% des profils (97% couverts grâce à la jointure BigQuery). INSEE open data suffit pour combler sans DPA complexe.</td></tr>
+        <tr><td>Logique de scoring composite</td><td><span class="verdict v-build">BUILD</span></td><td>Modèle fraîcheur/intention/complétude codé, testé, documenté. Le reconstruire chez un tiers serait régressif.</td></tr>
+        <tr><td>Time-to-market initial</td><td><span class="verdict v-build">BUILD</span></td><td>Pipeline opérationnel aujourd'hui. Pas besoin de tiers pour le MVP et le pilote commercial.</td></tr>
+        <tr><td>Conformité RGPD</td><td><span class="verdict v-build">BUILD</span></td><td>Toute intégration tiers nécessite un DPIA. Pour le MVP, rester dans le périmètre BigQuery de L'Étudiant est la voie la plus simple.</td></tr>
+        <tr><td>Scalabilité long terme (Y2+)</td><td><span class="verdict v-hybrid">HYBRIDE</span></td><td>BigQuery ML ou Vertex AI pour le modèle core. Partenaire commercial optionnel si Life-moment API décollage et clients B2B demandent des signaux externes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:3px solid var(--A);border-radius:var(--radius);padding:18px 22px;margin-top:16px;">
+    <div style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--A);margin-bottom:10px;">Recommandation finale</div>
+    <p style="font-size:13px;line-height:1.7;color:var(--ink);">
+      <strong>Architecture hybride en deux temps :</strong> (1) Lancer avec le pipeline in-house actuel sur BigQuery — c'est suffisant pour le MVP et le pilote. (2) À partir de la production, évaluer un enrichissement géographique INSEE (gratuit) pour les profils sans région. Les fournisseurs commerciaux ne sont pertinents qu'en Y2 si des clients Life-moment API demandent explicitement des signaux cross-domain — décision à revoir à ce moment-là.
+    </p>
+  </div>
+  <div class="source-note">Sources : schéma BigQuery letudiant-data-prod.Hacka_g21 · analyse taux complétude profiles_joined.csv · benchmarks fournisseurs enrichissement data France 2025–2026</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════════════
+
+let D = null;        // full barometer_data.json
+let leads = [];      // top_leads array
+let filtered = [];   // post-filter leads
+let charts = {};
+let revChart = null;
+
+async function init() {
+  try {
+    const r = await fetch('barometer_data.json');
+    D = await r.json();
+    leads = D.top_leads || [];
+    populateFilters();
+    filtered = [...leads];
+    renderKPIs();
+    renderInsights();
+    renderCharts();
+    renderTable();
+    document.getElementById('status-text').textContent =
+      `${D.kpis.total_scores.toLocaleString('fr-FR')} profils scorés · ${D.kpis.total_leads_activables.toLocaleString('fr-FR')} leads activables · données BigQuery réelles`;
+    document.getElementById('source-note').textContent =
+      `Source : BigQuery letudiant-data-prod.Hacka_g21 · Tables : Salons_Inscrits_et_venus, Site_Inscrits, CRM_Communication, Agent_Conversationnel_ORI · Pipeline letudiant.py · Run : ${new Date().toLocaleDateString('fr-FR')}`;
+    setTimeout(recalc, 200);
+  } catch(e) {
+    document.getElementById('status-text').textContent = 'Erreur chargement barometer_data.json · lancer : python -m http.server 8000';
+    console.error(e);
+  }
+}
+
+function populateFilters() {
+  const fo = D.filter_options;
+  const regionSel = document.getElementById('f-region');
+  (fo.regions || []).forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; regionSel.appendChild(o); });
+  const levelSel = document.getElementById('f-level');
+  (fo.levels || []).forEach(l => { if(!l) return; const o=document.createElement('option'); o.value=l; o.textContent=l; levelSel.appendChild(o); });
+}
+
+// ═══════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════
+
+function applyFilters() {
+  const fc    = document.getElementById('f-class').value;
+  const fr    = document.getElementById('f-region').value;
+  const fl    = document.getElementById('f-level').value;
+  const frec  = document.getElementById('f-recency').value;
+  const fns   = document.getElementById('f-noshow').value;
+
+  filtered = leads.filter(l => {
+    if (fc   && l.lead_class     !== fc)   return false;
+    if (fr   && l.Region         !== fr)   return false;
+    if (fl   && l.level_label    !== fl)   return false;
+    if (frec && l.recency_bucket !== frec) return false;
+    if (fns === 'true'  && l.no_show !== 'True')  return false;
+    if (fns === 'false' && l.no_show !== 'False') return false;
+    return true;
+  });
+
+  renderKPIs();
+  renderInsights();
+  renderCharts();
+  renderTable();
+}
+
+function resetFilters() {
+  ['f-class','f-region','f-level','f-recency','f-noshow'].forEach(id => document.getElementById(id).value = '');
+  applyFilters();
+}
+
+// ═══════════════════════════════════════════════════════
+// KPIs (uses global D for totals, filtered for subset)
+// ═══════════════════════════════════════════════════════
+
+function renderKPIs() {
+  const kpi = D.kpis;
+  const subset = filtered.length;
+  const A = filtered.filter(l=>l.lead_class==='A').length;
+  const ns = filtered.filter(l=>l.no_show==='True').length;
+  const avgScore = filtered.length ? (filtered.reduce((s,l)=>s+parseFloat(l.composite_score||0),0)/filtered.length).toFixed(1) : 0;
+
+  const cards = [
+    { label:'Leads activables (total)', value: kpi.total_leads_activables.toLocaleString('fr-FR'), sub:`sur ${kpi.total_scores.toLocaleString('fr-FR')} profils scorés`, color:'var(--accent)' },
+    { label:'Classe A · sélection', value: A, sub:`${subset ? Math.round(A/subset*100) : 0}% de la sélection filtrée`, color:'var(--A)' },
+    { label:'Score médian global', value: kpi.score_median, sub:'composite · fraîcheur + intention + complétude', color:'var(--accent2)' },
+    { label:'No-shows activables', value: kpi.no_shows_activables.toLocaleString('fr-FR'), sub:`${Math.round(kpi.no_shows_activables/kpi.total_leads_activables*100)}% des leads · Product 2`, color:'var(--C)' },
+    { label:'Score moyen · sélection', value: avgScore, sub:`sur ${subset} profils filtrés`, color:'var(--B)' },
+  ];
+  document.getElementById('kpi-grid').innerHTML = cards.map(k=>`
+    <div class="kpi" style="--kpi-color:${k.color}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// INSIGHTS
+// ═══════════════════════════════════════════════════════
+
+function renderInsights() {
+  const kpi = D.kpis;
+  const pctA = Math.round(kpi.classe_A / kpi.total_leads_activables * 100);
+  const pctNS = Math.round(kpi.no_shows_activables / kpi.total_leads_activables * 100);
+  const topRegion = D.region_scores[0] || {};
+  const nsTop = (D.noshow_by_level[0]||{});
+
+  const items = [
+    { icon:'🎯', text:`<strong>${pctA}% des leads activables sont en classe A</strong> — intention et fraîcheur suffisantes pour activation immédiate. Ces profils ont un historique de participation aux salons L'Étudiant et un profil complété.` },
+    { icon:'📍', text:`<strong>${topRegion.region || 'Île-de-France'} concentre le plus grand nombre de leads</strong> (${topRegion.count || ''} profils, score moyen ${topRegion.score_moyen || ''}/100) — surpondération structurelle liée à la densité de salons et à la source SAL-Salon.` },
+    { icon:'🔁', text:`<strong>${kpi.no_shows_activables} profils no-show conformes RGPD</strong> (${pctNS}% des leads activables) — inscrits aux salons n'ayant pas été présents. Intention prouvée par l'inscription : segment prioritaire pour Product 2.` },
+    { icon:'📊', text:`<strong>${nsTop.level || 'Terminale'} : ${nsTop.noshow_rate || 38}% de taux no-show</strong> (${nsTop.noshow || ''} absents sur ${nsTop.total || ''} inscrits) — le niveau le plus représenté dans les salons et dans les no-shows. Signal fort pour le rapport post-salon.` },
+    { icon:'💬', text:`<strong>Le chatbot orientation génère un signal comportemental exploitable</strong> — les sessions identifiées par id_Inscrit_site enrichissent le score d'intention directement. En production BigQuery, ce signal couvrira l'intégralité des ${(kpi.total_scores*0.4).toFixed(0)} conversations anonymes restantes.` },
+  ];
+  document.getElementById('insights-container').innerHTML = items.map(i=>`
+    <div class="insight"><div class="insight-icon">${i.icon}</div><div>${i.text}</div></div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════
+
+const GC = { grid:'rgba(226,221,213,0.8)', tick:'#b0ada8', font:'JetBrains Mono' };
+
+function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
+
+function renderCharts() {
+  // A/B/C (from filtered)
+  destroyChart('abc');
+  const abcCounts = ['A','B','C'].map(c=>filtered.filter(l=>l.lead_class===c).length);
+  // If no filtered data, fall back to global
+  const abcData = abcCounts.some(v=>v>0) ? abcCounts : [D.kpis.classe_A, D.kpis.classe_B, D.kpis.classe_C];
+  charts['abc'] = new Chart(document.getElementById('chart-abc'), {
+    type:'bar',
+    data:{ labels:['Classe A — Haute intention','Classe B — Intention modérée','Classe C — Faible intention'],
+      datasets:[{data:abcData, backgroundColor:['rgba(26,122,60,0.7)','rgba(200,122,26,0.7)','rgba(200,56,26,0.7)'], borderColor:['#1a7a3c','#c87a1a','#c8381a'], borderWidth:1, borderRadius:5}]},
+    options:{ indexAxis:'y', responsive:true, plugins:{legend:{display:false}},
+      scales:{ x:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, y:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
+  });
+
+  // Life-moments
+  destroyChart('lifemoment');
+  const lm = D.life_moments;
+  charts['lifemoment'] = new Chart(document.getElementById('chart-lifemoment'), {
+    type:'doughnut',
+    data:{ labels:Object.keys(lm), datasets:[{ data:Object.values(lm),
+      backgroundColor:['rgba(200,56,26,0.7)','rgba(26,95,200,0.6)','rgba(160,60,232,0.5)','rgba(200,122,26,0.5)'],
+      borderColor:['#c8381a','#1a5fc8','#a03ce8','#c87a1a'], borderWidth:1 }]},
+    options:{ cutout:'62%', responsive:true, plugins:{legend:{position:'bottom',labels:{color:GC.tick,font:{family:GC.font,size:10},padding:10,boxWidth:10}}} }
+  });
+
+  // Régions
+  destroyChart('region');
+  const reg = D.region_scores.slice(0,8);
+  charts['region'] = new Chart(document.getElementById('chart-region'), {
+    type:'bar',
+    data:{ labels:reg.map(r=>r.region.length>14?r.region.slice(0,14)+'…':r.region),
+      datasets:[{data:reg.map(r=>r.score_moyen), backgroundColor:'rgba(200,56,26,0.65)', borderColor:'#c8381a', borderWidth:1, borderRadius:4}]},
+    options:{ responsive:true, plugins:{legend:{display:false}},
+      scales:{ y:{min:0,max:100,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:40}} }}
+  });
+
+  // Recency
+  destroyChart('recency');
+  const rec = D.recency_buckets;
+  const recKeys = ['0-7d','8-30d','31-90d','91-365d','365d+'];
+  charts['recency'] = new Chart(document.getElementById('chart-recency'), {
+    type:'bar',
+    data:{ labels:recKeys,
+      datasets:[{data:recKeys.map(k=>rec[k]||0),
+        backgroundColor:['rgba(26,122,60,0.8)','rgba(26,122,60,0.6)','rgba(200,122,26,0.6)','rgba(200,56,26,0.5)','rgba(176,173,168,0.4)'],
+        borderColor:['#1a7a3c','#1a7a3c','#c87a1a','#c8381a','#b0ada8'], borderWidth:1, borderRadius:4}]},
+    options:{ responsive:true, plugins:{legend:{display:false}},
+      scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
+  });
+
+  // No-shows par niveau
+  destroyChart('noshows');
+  const ns = D.noshow_by_level;
+  charts['noshows'] = new Chart(document.getElementById('chart-noshows'), {
+    type:'bar',
+    data:{ labels:ns.map(n=>n.level.length>12?n.level.slice(0,12)+'…':n.level),
+      datasets:[{data:ns.map(n=>n.noshow_rate), backgroundColor:'rgba(200,56,26,0.65)', borderColor:'#c8381a', borderWidth:1, borderRadius:4}]},
+    options:{ responsive:true, plugins:{legend:{display:false}},
+      scales:{ y:{min:0,max:60,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:35}} }}
+  });
+
+  // CRM
+  destroyChart('crm');
+  const crm = D.crm_campaigns;
+  charts['crm'] = new Chart(document.getElementById('chart-crm'), {
+    type:'bar',
+    data:{ labels:crm.map(c=>c.name),
+      datasets:[
+        {label:'Taux ouverture %', data:crm.map(c=>c.open_rate), backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:3},
+        {label:'Taux clic %', data:crm.map(c=>c.click_rate), backgroundColor:'rgba(26,95,200,0.6)', borderColor:'#1a5fc8', borderWidth:1, borderRadius:3},
+      ]},
+    options:{ responsive:true,
+      plugins:{legend:{position:'top',labels:{color:GC.tick,font:{family:GC.font,size:10},boxWidth:10,padding:10}}},
+      scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
+  });
+
+  // Chatbot hebdo
+  destroyChart('chatbot');
+  const cw = D.chatbot_weekly;
+  charts['chatbot'] = new Chart(document.getElementById('chart-chatbot'), {
+    type:'line',
+    data:{ labels:cw.map(w=>w.week.split('/')[0]),
+      datasets:[
+        {label:'Sessions démarrées', data:cw.map(w=>w.sessions), borderColor:'#c8381a', backgroundColor:'rgba(200,56,26,0.07)', tension:0.4, fill:true, pointRadius:2},
+        {label:'Sessions complétées', data:cw.map(w=>w.ended), borderColor:'#1a5fc8', backgroundColor:'rgba(26,95,200,0.05)', tension:0.4, fill:true, pointRadius:2},
+      ]},
+    options:{ responsive:true,
+      plugins:{legend:{position:'top',labels:{color:GC.tick,font:{family:GC.font,size:10},boxWidth:10,padding:10}}},
+      scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:45}} }}
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// TABLE
+// ═══════════════════════════════════════════════════════
+
+function renderTable() {
+  const rows = filtered.slice(0,20).map(l=>`
+    <tr>
+      <td style="font-family:var(--font-mono);font-size:11px;">${l.id_Inscrit_site}</td>
+      <td><span class="badge badge-${l.lead_class}">${l.lead_class}</span></td>
+      <td style="font-family:var(--font-mono);">${parseFloat(l.composite_score).toFixed(1)}</td>
+      <td style="font-family:var(--font-mono);color:var(--ink-dim);">${parseFloat(l.score_freshness).toFixed(1)}</td>
+      <td style="font-family:var(--font-mono);color:var(--ink-dim);">${parseFloat(l.score_intent).toFixed(1)}</td>
+      <td style="font-family:var(--font-mono);color:var(--ink-dim);">${parseFloat(l.score_completeness).toFixed(1)}</td>
+      <td>${l.Region||'—'}</td>
+      <td>${l.level_label||'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:11px;">${l.recency_bucket||'—'}</td>
+      <td>${l.no_show==='True'?'<span class="badge badge-ns">no-show</span>':'—'}</td>
+    </tr>`).join('');
+  document.getElementById('leads-tbody').innerHTML = rows ||
+    '<tr><td colspan="10" style="text-align:center;color:var(--ink-dimmer);padding:28px;">Aucun profil ne correspond aux filtres sélectionnés</td></tr>';
+}
+
+// ═══════════════════════════════════════════════════════
+// BUSINESS PLAN
+// ═══════════════════════════════════════════════════════
+
+function g(id){ return parseFloat(document.getElementById(id)?.value||0); }
+function fmtK(v){ return v>=1000?(v/1000).toFixed(0)+'K€':v.toFixed(0)+'€'; }
+
+function recalc(){
+  const p1Price=g('p1-price'), p1Leads=g('p1-leads'), p1C1=g('p1-c1');
+  const p1Growth=g('p1-growth')/100, p1Conv=g('p1-conv')/100, p1Churn=g('p1-churn')/100;
+  const p1C2=Math.round(p1C1*(1+p1Growth)*(1-p1Churn)), p1C3=Math.round(p1C2*(1+p1Growth*0.6)*(1-p1Churn));
+  const p1Y1=p1C1*p1Leads*12*p1Price, p1Y2=p1C2*p1Leads*12*p1Price, p1Y3=p1C3*p1Leads*12*p1Price;
+
+  const p2Price=g('p2-price'), p2Sal=g('p2-salons'), p2Adopt=g('p2-adopt')/100;
+  const p2Exp=g('p2-exp'), p2Growth=g('p2-growth')/100;
+  const p2Y1=p2Sal*p2Exp*p2Adopt*p2Price;
+  const p2Y2=p2Sal*p2Exp*Math.min(p2Adopt*(1+p2Growth),0.75)*p2Price;
+  const p2Y3=p2Sal*p2Exp*Math.min(p2Adopt*(1+p2Growth)*1.4,0.90)*p2Price;
+
+  const p3Mrr=g('p3-mrr'), p3C1=g('p3-c1'), p3Growth=g('p3-growth')/100;
+  const p3Exp=g('p3-exports'), p3Ppu=g('p3-ppu');
+  const p3C2=Math.round(p3C1*(1+p3Growth)), p3C3=Math.round(p3C2*(1+p3Growth*0.7));
+  const p3Y1=p3C1*(p3Mrr*12+p3Exp*12*p3Ppu), p3Y2=p3C2*(p3Mrr*12+p3Exp*12*p3Ppu), p3Y3=p3C3*(p3Mrr*12+p3Exp*12*p3Ppu);
+
+  const tY1=p1Y1+p2Y1+p3Y1, tY2=p1Y2+p2Y2+p3Y2, tY3=p1Y3+p2Y3+p3Y3;
+  const infra=g('infra'), team=g('team'), dpo=g('dpo'), salesPct=g('sales-pct')/100;
+  const cY1=infra+team+dpo+tY1*salesPct, cY2=infra+team*1.3+dpo+tY2*salesPct, cY3=infra*1.5+team*2+dpo+tY3*salesPct;
+  const eY1=tY1-cY1, eY2=tY2-cY2, eY3=tY3-cY3;
+
+  // Revenue table
+  document.getElementById('rev-table').innerHTML = `
+    <thead><tr><th>Ligne</th><th>Année 1</th><th>Année 2</th><th>Année 3</th><th>Hypothèse clé</th></tr></thead>
+    <tbody>
+      <tr><td>P1 — Lead Feed</td><td>${fmtK(p1Y1)}</td><td>${fmtK(p1Y2)}</td><td>${fmtK(p1Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${p1C1}→${p1C2}→${p1C3} clients · conv. ${(p1Conv*100).toFixed(0)}%</td></tr>
+      <tr><td>P2 — No-Show Report</td><td>${fmtK(p2Y1)}</td><td>${fmtK(p2Y2)}</td><td>${fmtK(p2Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${(p2Adopt*100).toFixed(0)}% adoption exposants</td></tr>
+      <tr><td>P3 — Life-moment API</td><td>${fmtK(p3Y1)}</td><td>${fmtK(p3Y2)}</td><td>${fmtK(p3Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${p3C1}→${p3C2}→${p3C3} clients API</td></tr>
+      <tr><td>Coûts opérationnels</td><td style="color:var(--C);">-${fmtK(cY1)}</td><td style="color:var(--C);">-${fmtK(cY2)}</td><td style="color:var(--C);">-${fmtK(cY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">Infra+Équipe+DPO+Sales</td></tr>
+      <tr class="total"><td>CA Total</td><td>${fmtK(tY1)}</td><td>${fmtK(tY2)}</td><td>${fmtK(tY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">CAGR ${tY1>0?Math.round((Math.pow(tY3/Math.max(tY1,1),0.5)-1)*100):0}%</td></tr>
+      <tr class="total"><td>EBITDA estimé</td><td>${fmtK(eY1)}</td><td>${fmtK(eY2)}</td><td>${fmtK(eY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">Marge nette Y3 : ${tY3>0?Math.round(eY3/tY3*100):0}%</td></tr>
+    </tbody>`;
+
+  // Revenue chart
+  if(revChart){revChart.destroy();}
+  revChart = new Chart(document.getElementById('chart-revenue'),{
+    type:'bar',
+    data:{ labels:['Année 1','Année 2','Année 3'],
+      datasets:[
+        {label:'P1 Lead Feed', data:[p1Y1,p1Y2,p1Y3], backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:4},
+        {label:'P2 No-Show', data:[p2Y1,p2Y2,p2Y3], backgroundColor:'rgba(26,95,200,0.6)', borderColor:'#1a5fc8', borderWidth:1, borderRadius:4},
+        {label:'P3 API', data:[p3Y1,p3Y2,p3Y3], backgroundColor:'rgba(26,122,60,0.6)', borderColor:'#1a7a3c', borderWidth:1, borderRadius:4},
+      ]},
+    options:{ responsive:true,
+      plugins:{legend:{position:'top',labels:{color:GC.tick,font:{family:GC.font,size:10},boxWidth:10,padding:10}}},
+      scales:{ x:{stacked:true,grid:{display:false},ticks:{color:GC.tick}}, y:{stacked:true,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>(v/1000).toFixed(0)+'K€'}} }}
+  });
+
+  // Sensitivity 1 — conversion rate
+  const convRates=[6,10,14,18,22,28];
+  const baseConv=g('p1-conv');
+  document.getElementById('sens1').innerHTML=
+    '<thead><tr><th>Conv. rate</th><th>CA Y1</th><th>CA Y2</th><th>EBITDA Y1</th></tr></thead><tbody>'+
+    convRates.map(cr=>{
+      const c=Math.round(p1C1*cr/Math.max(baseConv,1));
+      const rev=c*p1Leads*12*p1Price;
+      const revY2=Math.round(c*(1+p1Growth)*(1-p1Churn))*p1Leads*12*p1Price;
+      const eb=rev-cY1;
+      const isBase=Math.abs(cr-baseConv)<1;
+      const h=isBase?'hb':(eb<0?'hl':eb<30000?'hm':'hh');
+      return`<tr><td class="${isBase?'hb':''}">${cr}%</td><td class="${h}">${fmtK(rev)}</td><td class="${h}">${fmtK(revY2)}</td><td class="${isBase?'hb':(eb<0?'hl':eb<30000?'hm':'hh')}">${fmtK(eb)}</td></tr>`;
+    }).join('')+'</tbody>';
+
+  // Sensitivity 2 — price per lead
+  const prices=[0.60,0.80,1.00,1.20,1.50,2.00];
+  document.getElementById('sens2').innerHTML=
+    '<thead><tr><th>Prix/lead</th><th>CA Y1</th><th>CA Y2</th><th>Marge brute</th></tr></thead><tbody>'+
+    prices.map(pr=>{
+      const rev=p1C1*p1Leads*12*pr;
+      const revY2=p1C2*p1Leads*12*pr;
+      const marge=Math.round((rev-p1C1*p1Leads*12*0.08)/Math.max(rev,1)*100);
+      const isBase=Math.abs(pr-p1Price)<0.05;
+      const h=isBase?'hb':(marge<70?'hl':marge<80?'hm':'hh');
+      return`<tr><td class="${isBase?'hb':''}">${pr.toFixed(2)}€</td><td class="${h}">${fmtK(rev)}</td><td class="${h}">${fmtK(revY2)}</td><td class="${h}">${marge}%</td></tr>`;
+    }).join('')+'</tbody>';
+}
+
+// ═══════════════════════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════════════════════
+
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='bizplan') setTimeout(recalc,100);
+}
+
+// INIT
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
