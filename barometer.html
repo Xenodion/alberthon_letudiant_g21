@@ -213,8 +213,8 @@ table.dt tr:hover td { background:var(--surface2); }
 
   <div class="grid-2">
     <div class="card">
-      <div class="card-title">Engagement CRM · ouvertures & clics</div>
-      <div class="card-desc">CRM_Communication · données réelles saison 25/26</div>
+      <div class="card-title">Campagnes CRM · taux de clic par service</div>
+      <div class="card-desc">CRM_Campagnes · saison 25/26 · agrégé par type de service</div>
       <canvas id="chart-crm" height="220"></canvas>
     </div>
     <div class="card">
@@ -597,6 +597,53 @@ const GC = { grid:'rgba(226,221,213,0.8)', tick:'#b0ada8', font:'JetBrains Mono'
 
 function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
 
+// ── Helpers : compute chart data from filtered leads or fall back to global D ──
+
+function getLifeMoments() {
+  if (!hasActiveFilter()) return D.life_moments;
+  const c = {};
+  filtered.forEach(l => { const m = l.life_moment||'undifferentiated'; c[m]=(c[m]||0)+1; });
+  return c;
+}
+
+function getRegionScores() {
+  if (!hasActiveFilter()) return D.region_scores;
+  const r = {};
+  filtered.forEach(l => {
+    if (!l.Region || l.Region==='—') return;
+    if (!r[l.Region]) r[l.Region]={sum:0,n:0};
+    r[l.Region].sum += parseFloat(l.composite_score||0);
+    r[l.Region].n   += 1;
+  });
+  return Object.entries(r)
+    .filter(([,d])=>d.n>=2)
+    .sort((a,b)=>b[1].n-a[1].n).slice(0,8)
+    .map(([region,d])=>({region, score_moyen:+(d.sum/d.n).toFixed(1), count:d.n}));
+}
+
+function getRecencyBuckets() {
+  if (!hasActiveFilter()) return D.recency_buckets;
+  const c = {};
+  filtered.forEach(l => { const b=l.recency_bucket||'365d+'; c[b]=(c[b]||0)+1; });
+  return c;
+}
+
+function getNoShowByLevel() {
+  if (!hasActiveFilter()) return D.noshow_by_level;
+  const lv = {};
+  filtered.forEach(l => {
+    const k = l.level_label;
+    if (!k||k==='—') return;
+    if (!lv[k]) lv[k]={total:0,noshow:0};
+    lv[k].total += 1;
+    if (l.no_show==='True') lv[k].noshow += 1;
+  });
+  return Object.entries(lv)
+    .sort((a,b)=>b[1].total-a[1].total).slice(0,8)
+    .map(([level,d])=>({level, total:d.total, noshow:d.noshow,
+      noshow_rate:d.total?+(d.noshow/d.total*100).toFixed(1):0}));
+}
+
 function renderCharts() {
   // A/B/C — global when no filter active, computed from filtered subset otherwise
   destroyChart('abc');
@@ -611,20 +658,20 @@ function renderCharts() {
       scales:{ x:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, y:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
   });
 
-  // Life-moments
+  // Life-moments — filter-aware
   destroyChart('lifemoment');
-  const lm = D.life_moments;
+  const lm = getLifeMoments();
   charts['lifemoment'] = new Chart(document.getElementById('chart-lifemoment'), {
     type:'doughnut',
     data:{ labels:Object.keys(lm), datasets:[{ data:Object.values(lm),
-      backgroundColor:['rgba(200,56,26,0.7)','rgba(26,95,200,0.6)','rgba(160,60,232,0.5)','rgba(200,122,26,0.5)'],
-      borderColor:['#c8381a','#1a5fc8','#a03ce8','#c87a1a'], borderWidth:1 }]},
+      backgroundColor:['rgba(200,56,26,0.7)','rgba(26,95,200,0.6)','rgba(160,60,232,0.5)','rgba(200,122,26,0.5)','rgba(26,122,60,0.5)'],
+      borderColor:['#c8381a','#1a5fc8','#a03ce8','#c87a1a','#1a7a3c'], borderWidth:1 }]},
     options:{ cutout:'62%', responsive:true, plugins:{legend:{position:'bottom',labels:{color:GC.tick,font:{family:GC.font,size:10},padding:10,boxWidth:10}}} }
   });
 
-  // Régions
+  // Régions — filter-aware
   destroyChart('region');
-  const reg = D.region_scores.slice(0,8);
+  const reg = getRegionScores();
   charts['region'] = new Chart(document.getElementById('chart-region'), {
     type:'bar',
     data:{ labels:reg.map(r=>r.region.length>14?r.region.slice(0,14)+'…':r.region),
@@ -633,10 +680,10 @@ function renderCharts() {
       scales:{ y:{min:0,max:100,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:40}} }}
   });
 
-  // Recency
+  // Recency — filter-aware
   destroyChart('recency');
-  const rec = D.recency_buckets;
   const recKeys = ['0-7d','8-30d','31-90d','91-365d','365d+'];
+  const rec = getRecencyBuckets();
   charts['recency'] = new Chart(document.getElementById('chart-recency'), {
     type:'bar',
     data:{ labels:recKeys,
@@ -647,30 +694,29 @@ function renderCharts() {
       scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
   });
 
-  // No-shows par niveau
+  // No-shows par niveau — filter-aware
   destroyChart('noshows');
-  const ns = D.noshow_by_level;
+  const ns = getNoShowByLevel();
   charts['noshows'] = new Chart(document.getElementById('chart-noshows'), {
     type:'bar',
     data:{ labels:ns.map(n=>n.level.length>12?n.level.slice(0,12)+'…':n.level),
       datasets:[{data:ns.map(n=>n.noshow_rate), backgroundColor:'rgba(200,56,26,0.65)', borderColor:'#c8381a', borderWidth:1, borderRadius:4}]},
     options:{ responsive:true, plugins:{legend:{display:false}},
-      scales:{ y:{min:0,max:60,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:35}} }}
+      scales:{ y:{min:0,max:100,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:35}} }}
   });
 
   // CRM
   destroyChart('crm');
-  const crm = D.crm_campaigns;
+  const crm = D.crm_campaigns || [];
   charts['crm'] = new Chart(document.getElementById('chart-crm'), {
     type:'bar',
     data:{ labels:crm.map(c=>c.name),
       datasets:[
-        {label:'Taux ouverture %', data:crm.map(c=>c.open_rate), backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:3},
-        {label:'Taux clic %', data:crm.map(c=>c.click_rate), backgroundColor:'rgba(26,95,200,0.6)', borderColor:'#1a5fc8', borderWidth:1, borderRadius:3},
+        {label:'Taux de clic %', data:crm.map(c=>c.click_rate), backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:4},
       ]},
     options:{ responsive:true,
-      plugins:{legend:{position:'top',labels:{color:GC.tick,font:{family:GC.font,size:10},boxWidth:10,padding:10}}},
-      scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
+      plugins:{legend:{display:false}},
+      scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10},maxRotation:30}} }}
   });
 
   // Chatbot hebdo

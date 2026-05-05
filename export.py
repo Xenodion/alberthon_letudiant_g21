@@ -77,18 +77,26 @@ def build_barometer_json(scored_all, activation, salons, crm_camp, conv):
         for _, r in ns_lvl.nlargest(8, "total").iterrows()
     ]
 
-    # Engagement CRM depuis activation (email_opened/clicked agrégés par prepare.py)
-    total_crm = int(activation["emails_received"].gt(0).sum()) if "emails_received" in activation.columns else len(activation)
-    n_opened  = int(activation["email_opened"].sum())  if "email_opened"  in activation.columns else 0
-    n_clicked = int(activation["email_clicked"].sum()) if "email_clicked" in activation.columns else 0
-    data["crm_campaigns"] = [{
-        "name": "Global saison 25/26",
-        "sent": total_crm,
-        "open_rate":  round(n_opened  / max(total_crm, 1) * 100, 1),
-        "click_rate": round(n_clicked / max(total_crm, 1) * 100, 1),
-        "unsub_rate": 0.0,
-        "service": "CRM"
-    }]
+    # CRM : agrégation depuis CRM_Campagnes par type de service
+    if len(crm_camp) > 0 and "Nb_Envois" in crm_camp.columns:
+        camp = crm_camp.copy()
+        camp["Nb_Envois"]      = pd.to_numeric(camp["Nb_Envois"],      errors="coerce").fillna(0)
+        camp["Nb_Clic_Unique"] = pd.to_numeric(camp["Nb_Clic_Unique"], errors="coerce").fillna(0)
+        agg = (
+            camp.groupby("Service", as_index=False)
+            .agg(sent=("Nb_Envois", "sum"), clicks=("Nb_Clic_Unique", "sum"))
+        )
+        agg = agg[agg["sent"] > 0].nlargest(6, "sent")
+        data["crm_campaigns"] = [
+            {
+                "name":       row["Service"],
+                "sent":       int(row["sent"]),
+                "click_rate": round(row["clicks"] / row["sent"] * 100, 1),
+            }
+            for _, row in agg.iterrows()
+        ]
+    else:
+        data["crm_campaigns"] = []
 
     # Chatbot hebdomadaire
     chat = conv.copy()

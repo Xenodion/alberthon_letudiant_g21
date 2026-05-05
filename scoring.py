@@ -130,24 +130,31 @@ def apply_compliance_filters(df):
 
 
 def classify_life_moment(row):
-    """Assigne un segment life-moment selon les signaux déclarés et comportementaux."""
+    """Assigne un segment life-moment selon les signaux déclarés et comportementaux.
+    Priorité : opt-ins explicites > niveau scolaire/chatbot > indifférencié."""
     level  = str(row.get("level_label",   "")).lower()
     domain = str(row.get("domaine_etude", "")).lower()
 
-    is_school = any(k in level for k in [
-        "terminale", "première", "seconde", "3ème", "4ème", "lycée", "bts", "bac+1"
-    ])
-    has_event = row.get("event_registrations", 0) > 0
-    has_chat  = row.get("chatbot_sessions",    0) > 0
-
-    if is_school or has_event or has_chat:
-        return "orientation_decision"
+    # 1. Opt-ins explicites en priorité absolue
     if (str(row.get("optin_FINANCE", "")).lower() == "true"
             or any(k in domain for k in ["banque", "finance", "assurance", "comptab"])):
         return "financial_entry"
+
     if (str(row.get("optin_HOUSING", "")).lower() == "true"
             or any(k in domain for k in ["logement", "immobilier"])):
         return "housing_transition"
+
+    if str(row.get("optin_COACHING", "")).lower() == "true":
+        return "coaching"
+
+    # 2. Niveau scolaire ou signal chatbot = intention orientation active
+    is_school = any(k in level for k in [
+        "terminale", "première", "seconde", "3ème", "4ème", "lycée", "bts", "bac+1"
+    ])
+    has_chat = row.get("chatbot_sessions", 0) > 0
+    if is_school or has_chat:
+        return "orientation_decision"
+
     return "undifferentiated"
 
 
