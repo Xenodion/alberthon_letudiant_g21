@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Product Specifications — L'Étudiant Data Products · Group 21</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red: #c0392b;
+  --ink: #1a1a1a;
+  --dim: #555;
+  --light: #888;
+  --border: #ddd;
+  --bg: #f9f8f6;
+  --green: #1a7a3c;
+}
+body { font-family: 'EB Garamond', Georgia, serif; font-size: 11.5pt; color: var(--ink); line-height: 1.75; background: white; }
+.page { max-width: 740px; margin: 0 auto; padding: 60px; }
+
+/* COVER */
+.cover { padding: 60px 0 48px; border-bottom: 2px solid var(--ink); margin-bottom: 52px; }
+.cover-meta { font-family: 'Inter', sans-serif; font-size: 9pt; color: var(--light); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px; }
+.cover h1 { font-size: 26pt; font-weight: 700; line-height: 1.2; }
+.cover h1 span { color: var(--red); }
+.cover-sub { font-size: 12pt; color: var(--dim); font-style: italic; margin-top: 8px; }
+.cover-authors { font-family: 'Inter', sans-serif; font-size: 9.5pt; color: var(--dim); margin-top: 28px; line-height: 2; }
+
+/* PRODUCT CARD */
+.product { margin-bottom: 60px; page-break-inside: avoid; }
+.product-header { background: var(--ink); color: white; padding: 28px 32px 22px; margin-bottom: 0; }
+.product-num { font-family: 'Inter', sans-serif; font-size: 8.5pt; letter-spacing: 3px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+.product-name { font-family: 'Inter', sans-serif; font-size: 18pt; font-weight: 700; color: white; line-height: 1.1; margin-bottom: 6px; }
+.product-tagline { font-size: 11pt; color: #aaa; font-style: italic; }
+.product-body { border: 1px solid var(--border); border-top: none; padding: 0; }
+.spec-row { display: grid; grid-template-columns: 130px 1fr; gap: 0; border-bottom: 1px solid var(--border); }
+.spec-row:last-child { border-bottom: none; }
+.spec-key { font-family: 'Inter', sans-serif; font-size: 8pt; text-transform: uppercase; letter-spacing: 1px; color: var(--light); padding: 14px 18px; background: var(--bg); border-right: 1px solid var(--border); display: flex; align-items: flex-start; padding-top: 16px; }
+.spec-val { font-size: 10.5pt; color: var(--ink); padding: 14px 20px; line-height: 1.6; }
+.spec-val ul { padding-left: 18px; margin: 0; }
+.spec-val li { color: var(--dim); margin-bottom: 4px; font-size: 10.5pt; }
+
+/* PRICING */
+.price-pill { display: inline-block; background: var(--ink); color: white; font-family: 'JetBrains Mono', monospace; font-size: 10.5pt; padding: 4px 12px; border-radius: 3px; margin-bottom: 6px; }
+.price-note { font-size: 9.5pt; color: var(--dim); margin-top: 4px; font-style: italic; }
+
+/* MARGIN BAR */
+.mbar-wrap { margin-top: 6px; }
+.mbar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+.mbar-fill { height: 100%; background: var(--green); border-radius: 3px; }
+.mbar-label { font-family: 'Inter', sans-serif; font-size: 9pt; color: var(--dim); margin-top: 4px; }
+
+/* GDPR NOTE */
+.gdpr-section { margin-top: 52px; page-break-inside: avoid; }
+.gdpr-section h2 { font-family: 'Inter', sans-serif; font-size: 13pt; font-weight: 600; color: var(--green); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.compliance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.compliance-item { display: flex; gap: 10px; font-size: 10.5pt; color: var(--dim); line-height: 1.5; padding: 10px 14px; background: #f0fdf4; border: 1px solid #bbf7d0; }
+.check { color: var(--green); font-weight: 700; flex-shrink: 0; font-family: 'Inter', sans-serif; }
+
+/* PRINT */
+@media print {
+  body { font-size: 10.5pt; }
+  .page { padding: 40px 50px; max-width: 100%; }
+  .product { page-break-inside: avoid; }
+  a { text-decoration: none; color: inherit; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-meta">L'Étudiant · Group 21 · Albert School × Mines Paris–PSL</div>
+  <h1>Data Product <span>Specifications</span></h1>
+  <div class="cover-sub">Three sellable products — client, inputs, transformations, pricing, margin</div>
+  <div class="cover-authors">
+    Alexandre Waerniers · Sereine Tawamba · Rajesy Ny Andrian Ravelaorimanga<br>
+    May 6, 2026
+  </div>
+</div>
+
+<!-- PRODUCT 1 -->
+<div class="product">
+  <div class="product-header">
+    <div class="product-num">Product 01</div>
+    <div class="product-name">High-Intent Lead Feed</div>
+    <div class="product-tagline">From a static contact list to a dynamic, ranked signal of purchase intent</div>
+  </div>
+  <div class="product-body">
+    <div class="spec-row">
+      <div class="spec-key">Client</div>
+      <div class="spec-val">Grandes écoles, universities, bootcamps — institutions with a defined cost-per-acquisition budget and a recruitment team that buys contact lists today</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Problem</div>
+      <div class="spec-val">L'Étudiant currently sells undifferentiated contact lists: a student who attended a salon last week and a student who registered two years ago cost the same per lead. The client pays for cold leads without knowing it.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Description</div>
+      <div class="spec-val">Weekly export of the top 200 prospects, re-ranked in real time from recent behavioural signals. The product is not the profile — it is the <em>rank</em>. A school receives a list sorted by who is most likely to respond to a contact attempt right now.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Inputs<br><span style="font-family:JetBrains Mono,monospace;font-size:8pt;font-weight:400;">(BigQuery)</span></div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>Salons_Inscrits_et_venus</strong> — salon registration dates, attendance, study level</li>
+          <li><strong>Site_Inscrits</strong> — profile completeness, opt-ins, geography, age</li>
+          <li><strong>CRM_Communication</strong> — email opens and clicks (season 25/26)</li>
+          <li><strong>Agent_Conversationnel_ORI_Conversation</strong> — chatbot sessions, engagement depth</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Transformations</div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>Freshness score (35%):</strong> exponential decay λ=0.015 from last cross-table interaction — half-life ~46 days</li>
+          <li><strong>Intent score (45%):</strong> weighted signals (salon registration ×20, attendance ×10, chatbot ×15, email click ×12, email open ×5) — tanh-normalised</li>
+          <li><strong>Completeness score (20%):</strong> email, phone, region, age, study level, field of study — each field weighted by commercial usability</li>
+          <li><strong>GDPR compliance filter:</strong> optin_commercial_actuel = True · age ≥ 18 · ACTIF = Toujours inscrit</li>
+          <li><strong>Percentile classification:</strong> top 15% → Class A, next 30% → Class B, bottom 55% → Class C</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Output</div>
+      <div class="spec-val">Weekly CSV or API response: pseudonymised ID, composite score, class (A/B/C), freshness score, intent score, completeness score, life-moment segment, recency bucket, study level, region. No PII in output.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Pricing</div>
+      <div class="spec-val">
+        <div class="price-pill">€0.80 – €2.00 / scored lead</div>
+        <div class="price-note">vs. €0.30–0.60 for a raw undifferentiated list → ×3 revenue per lead potential<br>Alternative: bundled into Premium Access subscription (€2,500/month) for weekly delivery</div>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Gross Margin</div>
+      <div class="spec-val">
+        <div class="mbar-wrap">
+          <div style="font-family:Inter,sans-serif;font-size:10pt;font-weight:600;color:var(--green);">85%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:85%"></div></div>
+          <div class="mbar-label">Marginal cost ~€0.08/lead · infrastructure shared across all products · no variable data acquisition cost</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT 2 -->
+<div class="product">
+  <div class="product-header">
+    <div class="product-num">Product 02</div>
+    <div class="product-name">No-Show Intelligence Report</div>
+    <div class="product-tagline">Transforming a sunk cost into a re-engagement opportunity</div>
+  </div>
+  <div class="product-body">
+    <div class="spec-row">
+      <div class="spec-key">Client</div>
+      <div class="spec-val">Salon exhibitors — schools and institutions that pay for a booth at L'Étudiant's fairs and want to identify registered students who did not show up and remain contactable</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Problem</div>
+      <div class="spec-val"><strong>43% of registered students do not attend the salon they signed up for</strong> — observed directly on real BigQuery data across multiple seasons. This is not an estimate. Each no-show expressed purchase intent (they registered) and then disappeared. Exhibitors currently have no visibility into who did not come, nor any mechanism to re-engage them. The data exists; it has never been turned into a product.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Description</div>
+      <div class="spec-val">A post-salon report delivered within 48 hours of each fair's closing. It identifies which registered students did not attend, segments them by profile and study level, flags those with prior CRM engagement (indicating higher re-engagement potential), and ranks them by composite score for immediate outreach.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Inputs<br><span style="font-family:JetBrains Mono,monospace;font-size:8pt;font-weight:400;">(BigQuery)</span></div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>Salons_Inscrits_et_venus</strong> — Showed_up = False, salon date, registration date, study level</li>
+          <li><strong>Site_Inscrits</strong> — optin_commercial_actuel, region, acquisition source, age</li>
+          <li><strong>CRM_Communication</strong> — prior email engagement before the salon date (signal of pre-salon intent)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Transformations</div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>No-show filter:</strong> Showed_up = False AND salon registration date IS NOT NULL AND id_Inscrit_site IS NOT NULL</li>
+          <li><strong>GDPR compliance filter:</strong> same three mandatory checks as Product 1</li>
+          <li><strong>Segmentation:</strong> by study level (Terminale, Bac+1…), by acquisition source, by region</li>
+          <li><strong>Re-engagement score:</strong> email opened or clicked in the 30 days before the salon + chatbot session = high re-engagement priority</li>
+          <li><strong>Ranking:</strong> composite score applied to no-show subset — highest-scored no-shows surfaced first</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Output</div>
+      <div class="spec-val">PDF report (narrative + tables) + CSV export: no-show count by segment, re-engagement score distribution, top 50 re-engageable profiles ranked by composite score. Delivered within 48h of salon closing.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Pricing</div>
+      <div class="spec-val">
+        <div class="price-pill">€3,000 – €8,000 / salon edition</div>
+        <div class="price-note">Price scales with salon size (registrant count). 10 salons/year × 25% exhibitor adoption in Y1 → €12,500 ARR. At 55% adoption (Y3) → €27,500 ARR.</div>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Gross Margin</div>
+      <div class="spec-val">
+        <div class="mbar-wrap">
+          <div style="font-family:Inter,sans-serif;font-size:10pt;font-weight:600;color:var(--green);">93%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:93%"></div></div>
+          <div class="mbar-label">Fully automated pipeline — cost is compute + QA review only · no manual data preparation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT 3 -->
+<div class="product">
+  <div class="product-header">
+    <div class="product-num">Product 03</div>
+    <div class="product-name">Life-moment Audience API</div>
+    <div class="product-tagline">Self-service segmentation for financial, housing and mobility partners</div>
+  </div>
+  <div class="product-body">
+    <div class="spec-row">
+      <div class="spec-key">Client</div>
+      <div class="spec-val">Financial partners (Boursorama, Hello Bank), student housing platforms (Studapart, NEXITY), insurers, international mobility operators — any B2B partner that needs to reach students at a specific life transition moment</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Problem</div>
+      <div class="spec-val">Today, a bank wanting to reach students who have opted in to financial products must call L'Étudiant's commercial team, negotiate a list, wait for manual extraction, and receive a CSV with no consent documentation. The process takes days and does not scale. There is no self-service, no audit trail, and no way to target by life-moment rather than demographic criteria alone.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Description</div>
+      <div class="spec-val">A REST API endpoint that lets partner companies query L'Étudiant's database by life-moment segment in real time. A query for <code style="font-family:JetBrains Mono,monospace;font-size:9.5pt">financial_entry</code> returns profiles of students who have explicitly opted in to financial communication and are entering higher education. Consent audit trail is built into every response.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Life-moment<br>Segments</div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>financial_entry</strong> — optin_FINANCE = True or study domain contains finance/banking. Target: banks, insurers.</li>
+          <li><strong>housing_transition</strong> — optin_HOUSING = True or study domain contains housing/real estate. Target: student housing platforms.</li>
+          <li><strong>coaching</strong> — optin_COACHING = True. Target: orientation advisors, bootcamps.</li>
+          <li><strong>orientation_decision</strong> — secondary school level or active chatbot sessions. Target: grandes écoles, universities.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Inputs<br><span style="font-family:JetBrains Mono,monospace;font-size:8pt;font-weight:400;">(BigQuery)</span></div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>Site_Inscrits</strong> — optin_FINANCE, optin_HOUSING, optin_COACHING, id_domaine_etude, region</li>
+          <li><strong>Site_Inscrits_dimension_domaine_etude</strong> — study domain labels for keyword classification</li>
+          <li><strong>All behavioural tables</strong> — for composite score applied to segment</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Transformations</div>
+      <div class="spec-val">
+        <ul>
+          <li><strong>Life-moment classification:</strong> opt-in signals evaluated first (explicit consent > inferred intent); school level and chatbot as fallback signals</li>
+          <li><strong>GDPR compliance filter:</strong> same three mandatory checks; consent type recorded per profile per export</li>
+          <li><strong>Scoring:</strong> composite A/B/C applied within each segment — caller can filter by class</li>
+          <li><strong>Audit trail:</strong> each API response logs export timestamp, partner ID, segment queried, optin_type, profile count — immutable record for DPO</li>
+        </ul>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Output</div>
+      <div class="spec-val">JSON response per profile: pseudonymised ID, life-moment segment, lead class (A/B/C), composite score, region, study level. No PII. Consent type and audit timestamp included in response header.</div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Pricing</div>
+      <div class="spec-val">
+        <div class="price-pill">€500 – €2,000 / month platform access</div>
+        <div style="margin-top:8px;"><div class="price-pill" style="font-size:9.5pt;">+ €0.50 – €1.20 / exported profile</div></div>
+        <div class="price-note" style="margin-top:8px;">Tier: Standard API at €500/month for up to 500 profiles/month · Premium API at €2,000/month for unlimited with SLA. Usage-based overage above monthly threshold.</div>
+      </div>
+    </div>
+    <div class="spec-row">
+      <div class="spec-key">Gross Margin</div>
+      <div class="spec-val">
+        <div class="mbar-wrap">
+          <div style="font-family:Inter,sans-serif;font-size:10pt;font-weight:600;color:var(--green);">78%</div>
+          <div class="mbar"><div class="mbar-fill" style="width:78%"></div></div>
+          <div class="mbar-label">Lower than P1/P2 due to API infrastructure cost + DPO audit overhead + ongoing partner management</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GDPR NOTE -->
+<div class="gdpr-section">
+  <h2>GDPR Compliance Note — Pipeline by Design</h2>
+  <p>No profile reaches an activation output without passing all three compliance filters. These checks run automatically at every pipeline execution, before any export or API response is generated.</p>
+  <div class="compliance-grid">
+    <div class="compliance-item"><span class="check">✓</span><span><strong>optin_commercial_actuel = True</strong> — explicit commercial consent required. Profiles without this field set to True are excluded from all outputs regardless of score.</span></div>
+    <div class="compliance-item"><span class="check">✓</span><span><strong>Age verification on Naissance_Date</strong> — profiles where date of birth indicates the individual is under 18 are automatically excluded. Benefit of the doubt applies where date of birth is absent.</span></div>
+    <div class="compliance-item"><span class="check">✓</span><span><strong>ACTIF = Toujours inscrit</strong> — users who have unsubscribed or deactivated are excluded. Deactivation propagates to all pipeline outputs via the id_Inscrit_site key.</span></div>
+    <div class="compliance-item"><span class="check">✓</span><span><strong>No PII in any output</strong> — email, phone number and name are never included in scored profiles, exports or API responses. Only the pseudonymised id_Inscrit_site is carried through.</span></div>
+    <div class="compliance-item"><span class="check">✓</span><span><strong>Right to erasure</strong> — the id_Inscrit_site key enables cascading deletion across all pipeline outputs: scored CSVs, activation CSVs, and barometer JSON are all keyed on this single identifier.</span></div>
+    <div class="compliance-item"><span class="check">✓</span><span><strong>Consent audit trail (Product 3)</strong> — every Life-moment API export logs partner ID, segment queried, export timestamp and optin_type. Immutable record for DPO compliance review.</span></div>
+  </div>
+  <p style="margin-top:20px;font-size:9.5pt;color:var(--dim);font-style:italic;">Pipeline source code and compliance note: <code style="font-family:JetBrains Mono,monospace">scoring.py → apply_compliance_filters()</code> · Full documentation in README.md · Standalone compliance note: <code style="font-family:JetBrains Mono,monospace">compliance_note_g21.pdf</code></p>
+</div>
+
+</div>
+</body>
+</html>
