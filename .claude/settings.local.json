@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ' *)",
+      "Bash(powershell -Command \"head -11 'c:\\\\Users\\\\awaerniers\\\\OneDrive - synchrone.fr\\\\AlbertSchool\\\\alberthon_letudiant_g21\\\\data\\\\CRM_Campagnes.csv' | ConvertFrom-Csv | Format-Table -AutoSize | Out-String\")"
+    ]
+  }
+}

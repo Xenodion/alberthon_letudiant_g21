@@ -53,8 +53,20 @@ def score_completeness(df):
         df["Region"].notna().astype(float)                 * 15 +
         df["Naissance_Date"].notna().astype(float)         * 10 +
         df["level_label"].str.strip().ne("").astype(float) * 20 +
-        df["study_field_interests"].notna().astype(float)  * 15
+        df["domaine_etude"].notna().astype(float)          * 15
     ).clip(0, 100).round(2)
+
+
+def _percentile_classify(df, col="composite_score"):
+    """Classifie par rang relatif : top 15% → A, 30% suivants → B, 55% → C.
+    Approche standard en production : les seuils s'adaptent à la distribution réelle."""
+    df = df.copy()
+    df["lead_class"] = pd.qcut(
+        df[col].rank(method="first"),
+        q=[0.0, 0.55, 0.85, 1.0],
+        labels=["C", "B", "A"],
+    )
+    return df
 
 
 def run_scoring(df):
@@ -68,9 +80,7 @@ def run_scoring(df):
         df["score_intent"]       * 0.45 +
         df["score_completeness"] * 0.20
     ).round(2)
-    df["lead_class"] = pd.cut(
-        df["composite_score"], bins=[-1, 35, 60, 101], labels=["C", "B", "A"]
-    )
+    df = _percentile_classify(df)
     return df.sort_values("composite_score", ascending=False).reset_index(drop=True)
 
 
@@ -121,29 +131,29 @@ def apply_compliance_filters(df):
 
 def classify_life_moment(row):
     """Assigne un segment life-moment selon les signaux déclarés et comportementaux."""
-    level = str(row.get("level_label", "")).lower()
-    field = str(row.get("study_field_interests", "")).lower()
+    level  = str(row.get("level_label",   "")).lower()
+    domain = str(row.get("domaine_etude", "")).lower()
 
     is_school = any(k in level for k in [
         "terminale", "première", "seconde", "3ème", "4ème", "lycée", "bts", "bac+1"
     ])
     has_event = row.get("event_registrations", 0) > 0
-    has_chat  = row.get("chatbot_sessions", 0) > 0
+    has_chat  = row.get("chatbot_sessions",    0) > 0
 
     if is_school or has_event or has_chat:
         return "orientation_decision"
     if (str(row.get("optin_FINANCE", "")).lower() == "true"
-            or any(k in field for k in ["banque", "finance", "assurance"])):
+            or any(k in domain for k in ["banque", "finance", "assurance", "comptab"])):
         return "financial_entry"
     if (str(row.get("optin_HOUSING", "")).lower() == "true"
-            or "logement" in field):
+            or any(k in domain for k in ["logement", "immobilier"])):
         return "housing_transition"
     return "undifferentiated"
 
 
 def segment_and_enrich(df):
-    """Ajoute life_moment, estimated_age et recency_bucket."""
-    df = df.copy()
+    """Reclassifie sur le sous-ensemble RGPD, ajoute life_moment, age, recency."""
+    df = _percentile_classify(df)  # 15% A / 30% B / 55% C sur les leads activables
     df["life_moment"] = df.apply(classify_life_moment, axis=1)
 
     def calc_age(d):
@@ -173,6 +183,9 @@ def print_pipeline_report(df):
     print("=" * 60)
     total = len(df)
     print(f"Leads activables : {total}")
+    if total == 0:
+        print("  ⚠ Aucun lead activable — vérifier les filtres RGPD et la jointure inscrit.")
+        return
     for cls, cnt in df["lead_class"].value_counts().sort_index().items():
         bar = "█" * int(cnt / total * 40)
         print(f"  {cls}  {bar}  {cnt:4d}  ({cnt/total:.0%})")

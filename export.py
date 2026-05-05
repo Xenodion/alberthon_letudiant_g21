@@ -104,7 +104,7 @@ def build_barometer_json(scored_all, activation, salons, crm_camp, conv):
         for _, r in chat_w.iterrows()
     ]
 
-    # Top 50 leads pour la table du dashboard
+    # Tous les leads activables pour la table et les filtres du dashboard
     top_cols = [
         "id_Inscrit_site", "lead_class", "composite_score", "score_freshness",
         "score_intent", "score_completeness", "life_moment", "recency_bucket",
@@ -113,7 +113,7 @@ def build_barometer_json(scored_all, activation, salons, crm_camp, conv):
         "chatbot_sessions", "email_opened", "email_clicked", "Acquisition_source"
     ]
     avail = [c for c in top_cols if c in activation.columns]
-    top50 = activation[avail].head(50).copy()
+    top50 = activation[avail].copy()
     for col in top50.columns:
         top50[col] = top50[col].astype(str).replace({"nan": "", "None": ""})
     data["top_leads"] = top50.to_dict(orient="records")

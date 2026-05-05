@@ -104,7 +104,7 @@ Appliqués dans `scoring.py` avant toute activation commerciale :
 2. Majorité vérifiée sur `Naissance_Date` — exclusion des mineurs
 3. `ACTIF = Toujours inscrit` — profils désinscrits exclus
 
-Les emails restent **hashés SHA-256** dans BigQuery — aucune PII en clair dans les outputs de scoring.
+Aucun champ PII (email, téléphone, nom) n'est inclus dans les outputs d'activation (`scored_all_profiles.csv`, `activation_ready_leads.csv`, `barometer_data.json`) — uniquement `id_Inscrit_site` pseudonymisé. La clé permet la suppression propagée sur tous les outputs (droit à l'oubli).
 
 ---
 

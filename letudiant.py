@@ -22,8 +22,14 @@ import sys, io, warnings
 warnings.filterwarnings("ignore")
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
-from config    import PROJECT, DATASET, TODAY
-from bq_client import load_all
+from config    import PROJECT, DATASET, TODAY, DATA_MODE
+
+if DATA_MODE == "synthetic":
+    from synthetic     import load_all
+elif DATA_MODE == "local":
+    from local_loader  import load_all
+else:
+    from bq_client     import load_all
 from prepare   import prepare_profiles
 from scoring   import (run_scoring, print_scoring_report,
                        apply_compliance_filters, segment_and_enrich,
@@ -35,7 +41,8 @@ if __name__ == "__main__":
     print("=" * 60)
     print("L'ÉTUDIANT — DATA PRODUCT PIPELINE · GROUPE 21")
     print(f"Run    : {TODAY.strftime('%Y-%m-%d %H:%M')}")
-    print(f"Source : BigQuery {PROJECT}.{DATASET}")
+    src = {"synthetic": "Données synthétiques", "local": "CSV locaux (data/)"}.get(DATA_MODE, f"BigQuery {PROJECT}.{DATASET}")
+    print(f"Source : {src}")
     print("=" * 60)
 
     # 1. Chargement BigQuery (une requête par table)
@@ -48,6 +55,10 @@ if __name__ == "__main__":
         tables["inscrits"],
         tables["crm"],
         tables["conv"],
+        tables["dim_study_level"],
+        tables["dim_profile"],
+        tables["dim_domaine"],
+        tables["dim_serie"],
     )
 
     # 3. Scoring

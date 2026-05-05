@@ -145,88 +145,7 @@ table.dt tr:hover td { background:var(--surface2); }
 .badge-ns { background:#fee2e2; color:var(--C); }
 .badge-ori { background:#eff6ff; color:var(--accent2); }
 
-/* SPEC CARDS */
-.spec-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-@media(max-width:900px) { .spec-grid { grid-template-columns:1fr; } }
-.spec-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-.spec-head { padding:22px 26px 18px; background:var(--ink); }
-.spec-num { font-family:var(--font-mono); font-size:9px; color:#888; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
-.spec-name { font-family:var(--font-display); font-size:22px; font-weight:800; color:#fff; line-height:1.1; margin-bottom:4px; }
-.spec-tag { font-size:12px; color:#aaa; font-style:italic; }
-.spec-body { padding:20px 26px; }
-.spec-row { display:grid; grid-template-columns:110px 1fr; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
-.spec-row:last-child { border-bottom:none; }
-.spec-key { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); padding-top:2px; }
-.spec-val { font-size:12px; color:var(--ink); line-height:1.5; }
-.spec-val ul { padding-left:14px; }
-.spec-val li { color:var(--ink-dim); margin-bottom:3px; }
-.price-pill { display:inline-block; background:var(--ink); color:#fff; font-family:var(--font-mono); font-size:12px; padding:5px 12px; border-radius:4px; margin-bottom:6px; }
-.mbar { height:5px; background:var(--border); border-radius:3px; margin-top:6px; overflow:hidden; }
-.mbar-fill { height:100%; background:var(--A); border-radius:3px; }
-.mbar-label { font-family:var(--font-mono); font-size:10px; color:var(--ink-dim); margin-top:3px; }
-
-/* BIZPLAN */
-.bp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
-@media(max-width:900px) { .bp-grid { grid-template-columns:1fr; } }
-.assumption-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; }
-.assum-title { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); margin-bottom:14px; }
-.assum-row { display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid var(--border); gap:10px; }
-.assum-row:last-child { border-bottom:none; }
-.assum-name { font-size:12px; color:var(--ink-dim); }
-input.assum-input { background:var(--surface2); border:1px solid var(--border); color:var(--ink); font-family:var(--font-mono); font-size:12px; padding:3px 8px; border-radius:4px; width:78px; text-align:right; }
-input.assum-input:focus { outline:none; border-color:var(--accent); }
-.rev-table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:16px; }
-table.rev { width:100%; border-collapse:collapse; font-size:13px; }
-table.rev th { background:var(--ink); color:#888; font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; padding:12px 18px; text-align:right; border-bottom:none; }
-table.rev th:first-child { text-align:left; color:#ccc; }
-table.rev td { padding:11px 18px; text-align:right; font-family:var(--font-mono); border-bottom:1px solid var(--border); color:var(--ink); }
-table.rev td:first-child { text-align:left; font-family:var(--font-body); color:var(--ink-dim); }
-table.rev tr.total td { border-top:2px solid var(--border); color:var(--accent); font-weight:600; background:#fff8f6; }
-table.rev tr.total td:first-child { color:var(--ink); }
-table.rev tr:last-child td { border-bottom:none; }
-
-.sens-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
-@media(max-width:900px) { .sens-grid { grid-template-columns:1fr; } }
-table.sens { width:100%; border-collapse:collapse; font-size:12px; font-family:var(--font-mono); }
-table.sens th { color:var(--ink-dimmer); font-size:9px; text-align:center; padding:6px 8px; border-bottom:1px solid var(--border); }
-table.sens td { text-align:center; padding:6px 8px; border-bottom:1px solid var(--border); }
-table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:1px solid var(--border); }
-.hl { background:#fee2e2; color:var(--C); }
-.hm { background:#fef9c3; color:var(--B); }
-.hh { background:#dcfce7; color:var(--A); }
-.hb { background:var(--ink); color:#fff; }
-
-/* BVP */
-.bvp-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
-@media(max-width:900px) { .bvp-grid { grid-template-columns:1fr; } }
-.bvp-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; }
-.bvp-card.rec { border-color:var(--A); border-width:2px; }
-.bvp-label { font-family:var(--font-mono); font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dimmer); margin-bottom:6px; }
-.bvp-label.rec { color:var(--A); }
-.bvp-title { font-family:var(--font-display); font-size:20px; font-weight:800; margin-bottom:16px; }
-.bvp-item { display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:12px; line-height:1.4; }
-.bvp-item:last-child { border-bottom:none; }
-.pro { color:var(--A); font-weight:700; flex-shrink:0; }
-.con { color:var(--C); font-weight:700; flex-shrink:0; }
-.df-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:4px; }
-.df-table th { font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-dimmer); padding:8px 14px; border-bottom:2px solid var(--border); text-align:left; }
-.df-table td { padding:10px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top; line-height:1.45; }
-.df-table tr:last-child td { border-bottom:none; }
-.verdict { display:inline-block; padding:2px 8px; border-radius:4px; font-family:var(--font-mono); font-size:10px; font-weight:600; }
-.v-build { background:#dcfce7; color:var(--A); }
-.v-partner { background:#eff6ff; color:var(--accent2); }
-.v-hybrid { background:#fef9c3; color:var(--B); }
-
-.compliance-box { background:#f0fdf4; border:1px solid #bbf7d0; border-radius:var(--radius); padding:18px 22px; margin-top:16px; }
-.compliance-title { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--A); margin-bottom:12px; }
-.compliance-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; margin-top:10px; }
-.compliance-item { display:flex; gap:8px; font-size:12px; color:var(--ink-dim); }
-.check { color:var(--A); flex-shrink:0; font-weight:700; }
-
 .source-note { font-family:var(--font-mono); font-size:10px; color:var(--ink-dimmer); margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
-
-.recalc-btn { background:var(--ink); color:#fff; border:none; font-family:var(--font-display); font-size:12px; font-weight:700; padding:8px 20px; border-radius:5px; cursor:pointer; letter-spacing:0.3px; transition:background 0.15s; }
-.recalc-btn:hover { background:var(--accent); }
 </style>
 </head>
 <body>
@@ -234,10 +153,7 @@ table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:
 <header class="header">
   <div class="logo">L'<span>É</span>tudiant <span class="logo-sub">DATA INTELLIGENCE · G21</span></div>
   <nav class="nav">
-    <button class="nav-btn active" onclick="switchView('barometer',this)">Baromètre</button>
-    <button class="nav-btn" onclick="switchView('specs',this)">Fiches Produit</button>
-    <button class="nav-btn" onclick="switchView('bizplan',this)">Business Plan</button>
-    <button class="nav-btn" onclick="switchView('bvp',this)">Build vs Partner</button>
+    <button class="nav-btn active">Baromètre Orientation</button>
   </nav>
   <div class="header-status"><div class="dot"></div><span id="status-text">Chargement…</span></div>
 </header>
@@ -326,9 +242,7 @@ table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:
   <div class="source-note" id="source-note"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     FICHES PRODUIT
-═══════════════════════════════════════════ -->
+<!-- removed: Fiches Produit, Business Plan, Build vs Partner
 <div id="view-specs" class="view">
   <div class="section-header">
     <div class="section-title">Fiches <em>Produit</em></div>
@@ -398,9 +312,8 @@ table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:
       <div class="compliance-item"><span class="check">✓</span><span>optin_commercial_actuel = True · consentement explicite requis</span></div>
       <div class="compliance-item"><span class="check">✓</span><span>Majorité vérifiée sur Naissance_Date · exclusion mineurs</span></div>
       <div class="compliance-item"><span class="check">✓</span><span>ACTIF = Toujours inscrit · profils désinscrits exclus</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Emails hashés SHA-256 dans BigQuery · zéro PII en clair</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Audit trail d'export · date + client + volume + optin_type</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Droit à l'oubli : suppression propagée via id_Inscrit_site</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Aucun champ PII (email, téléphone, nom) dans les outputs d'activation — uniquement id_Inscrit_site pseudonymisé</span></div>
+      <div class="compliance-item"><span class="check">✓</span><span>Droit à l'oubli : la clé id_Inscrit_site permet la suppression propagée sur tous les outputs du pipeline</span></div>
     </div>
   </div>
 </div>
@@ -515,6 +428,7 @@ table.sens td:first-child { text-align:left; color:var(--ink-dim); border-right:
   </div>
   <div class="source-note">Sources : schéma BigQuery letudiant-data-prod.Hacka_g21 · analyse taux complétude profiles_joined.csv · benchmarks fournisseurs enrichissement data France 2025–2026</div>
 </div>
+-->
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -525,7 +439,6 @@ let D = null;        // full barometer_data.json
 let leads = [];      // top_leads array
 let filtered = [];   // post-filter leads
 let charts = {};
-let revChart = null;
 
 async function init() {
   try {
@@ -542,7 +455,6 @@ async function init() {
       `${D.kpis.total_scores.toLocaleString('fr-FR')} profils scorés · ${D.kpis.total_leads_activables.toLocaleString('fr-FR')} leads activables · données BigQuery réelles`;
     document.getElementById('source-note').textContent =
       `Source : BigQuery letudiant-data-prod.Hacka_g21 · Tables : Salons_Inscrits_et_venus, Site_Inscrits, CRM_Communication, Agent_Conversationnel_ORI · Pipeline letudiant.py · Run : ${new Date().toLocaleDateString('fr-FR')}`;
-    setTimeout(recalc, 200);
   } catch(e) {
     document.getElementById('status-text').textContent = 'Erreur chargement barometer_data.json · lancer : python -m http.server 8000';
     console.error(e);
@@ -560,6 +472,11 @@ function populateFilters() {
 // ═══════════════════════════════════════════════════════
 // FILTERS
 // ═══════════════════════════════════════════════════════
+
+function hasActiveFilter() {
+  return ['f-class','f-region','f-level','f-recency','f-noshow']
+    .some(id => document.getElementById(id).value !== '');
+}
 
 function applyFilters() {
   const fc    = document.getElementById('f-class').value;
@@ -594,18 +511,23 @@ function resetFilters() {
 // ═══════════════════════════════════════════════════════
 
 function renderKPIs() {
-  const kpi = D.kpis;
+  const kpi    = D.kpis;
+  const active = hasActiveFilter();
   const subset = filtered.length;
-  const A = filtered.filter(l=>l.lead_class==='A').length;
-  const ns = filtered.filter(l=>l.no_show==='True').length;
-  const avgScore = filtered.length ? (filtered.reduce((s,l)=>s+parseFloat(l.composite_score||0),0)/filtered.length).toFixed(1) : 0;
+
+  const A  = active ? filtered.filter(l=>l.lead_class==='A').length : kpi.classe_A;
+  const ns = active ? filtered.filter(l=>l.no_show==='True').length : kpi.no_shows_activables;
+  const avgScore = (active && subset)
+    ? (filtered.reduce((s,l)=>s+parseFloat(l.composite_score||0),0)/subset).toFixed(1)
+    : kpi.score_median;
+  const base = active ? subset : kpi.total_leads_activables;
 
   const cards = [
     { label:'Leads activables (total)', value: kpi.total_leads_activables.toLocaleString('fr-FR'), sub:`sur ${kpi.total_scores.toLocaleString('fr-FR')} profils scorés`, color:'var(--accent)' },
-    { label:'Classe A · sélection', value: A, sub:`${subset ? Math.round(A/subset*100) : 0}% de la sélection filtrée`, color:'var(--A)' },
-    { label:'Score médian global', value: kpi.score_median, sub:'composite · fraîcheur + intention + complétude', color:'var(--accent2)' },
-    { label:'No-shows activables', value: kpi.no_shows_activables.toLocaleString('fr-FR'), sub:`${Math.round(kpi.no_shows_activables/kpi.total_leads_activables*100)}% des leads · Product 2`, color:'var(--C)' },
-    { label:'Score moyen · sélection', value: avgScore, sub:`sur ${subset} profils filtrés`, color:'var(--B)' },
+    { label:'Classe A · sélection',     value: A, sub:`${base ? Math.round(A/base*100) : 0}% des leads${active?' filtrés':' activables'}`, color:'var(--A)' },
+    { label:'Score médian global',       value: kpi.score_median, sub:'composite · fraîcheur + intention + complétude', color:'var(--accent2)' },
+    { label:'No-shows activables',       value: ns.toLocaleString('fr-FR'), sub:`${base ? Math.round(ns/base*100) : 0}% des leads · Product 2`, color:'var(--C)' },
+    { label:'Score moyen · sélection',   value: avgScore, sub:`sur ${base.toLocaleString('fr-FR')} profils${active?' filtrés':' activables'}`, color:'var(--B)' },
   ];
   document.getElementById('kpi-grid').innerHTML = cards.map(k=>`
     <div class="kpi" style="--kpi-color:${k.color}">
@@ -620,18 +542,48 @@ function renderKPIs() {
 // ═══════════════════════════════════════════════════════
 
 function renderInsights() {
-  const kpi = D.kpis;
-  const pctA = Math.round(kpi.classe_A / kpi.total_leads_activables * 100);
-  const pctNS = Math.round(kpi.no_shows_activables / kpi.total_leads_activables * 100);
-  const topRegion = D.region_scores[0] || {};
-  const nsTop = (D.noshow_by_level[0]||{});
+  const total = filtered.length || 1;
+  const A  = filtered.filter(l=>l.lead_class==='A').length;
+  const ns = filtered.filter(l=>l.no_show==='True').length;
+  const pctA  = Math.round(A  / total * 100);
+  const pctNS = Math.round(ns / total * 100);
+
+  // Top region from filtered leads
+  const regionCount = {}, regionScore = {};
+  filtered.forEach(l => {
+    if (!l.Region || l.Region === '—') return;
+    regionCount[l.Region] = (regionCount[l.Region]||0) + 1;
+    regionScore[l.Region] = (regionScore[l.Region]||0) + parseFloat(l.composite_score||0);
+  });
+  const topRegionName = Object.keys(regionCount).sort((a,b)=>regionCount[b]-regionCount[a])[0]
+    || (D.region_scores[0]||{}).region || 'Île-de-France';
+  const topRegionCount = regionCount[topRegionName] || '';
+  const topRegionScore = topRegionCount
+    ? (regionScore[topRegionName] / topRegionCount).toFixed(1)
+    : ((D.region_scores[0]||{}).score_moyen||'');
+
+  // No-show rate by level from filtered leads
+  const lvTotal = {}, lvNS = {};
+  filtered.forEach(l => {
+    const lv = l.level_label;
+    if (!lv || lv === '—') return;
+    lvTotal[lv] = (lvTotal[lv]||0) + 1;
+    if (l.no_show === 'True') lvNS[lv] = (lvNS[lv]||0) + 1;
+  });
+  const topLevel = Object.keys(lvTotal).sort((a,b)=>lvTotal[b]-lvTotal[a])[0]
+    || (D.noshow_by_level[0]||{}).level || 'Terminale';
+  const topLevelTotal = lvTotal[topLevel] || (D.noshow_by_level[0]||{}).total || '';
+  const topLevelNS    = lvNS[topLevel]   || 0;
+  const topLevelRate  = topLevelTotal
+    ? Math.round(topLevelNS / topLevelTotal * 100)
+    : ((D.noshow_by_level[0]||{}).noshow_rate || 38);
 
   const items = [
-    { icon:'🎯', text:`<strong>${pctA}% des leads activables sont en classe A</strong> — intention et fraîcheur suffisantes pour activation immédiate. Ces profils ont un historique de participation aux salons L'Étudiant et un profil complété.` },
-    { icon:'📍', text:`<strong>${topRegion.region || 'Île-de-France'} concentre le plus grand nombre de leads</strong> (${topRegion.count || ''} profils, score moyen ${topRegion.score_moyen || ''}/100) — surpondération structurelle liée à la densité de salons et à la source SAL-Salon.` },
-    { icon:'🔁', text:`<strong>${kpi.no_shows_activables} profils no-show conformes RGPD</strong> (${pctNS}% des leads activables) — inscrits aux salons n'ayant pas été présents. Intention prouvée par l'inscription : segment prioritaire pour Product 2.` },
-    { icon:'📊', text:`<strong>${nsTop.level || 'Terminale'} : ${nsTop.noshow_rate || 38}% de taux no-show</strong> (${nsTop.noshow || ''} absents sur ${nsTop.total || ''} inscrits) — le niveau le plus représenté dans les salons et dans les no-shows. Signal fort pour le rapport post-salon.` },
-    { icon:'💬', text:`<strong>Le chatbot orientation génère un signal comportemental exploitable</strong> — les sessions identifiées par id_Inscrit_site enrichissent le score d'intention directement. En production BigQuery, ce signal couvrira l'intégralité des ${(kpi.total_scores*0.4).toFixed(0)} conversations anonymes restantes.` },
+    { icon:'🎯', text:`<strong>${pctA}% des leads sélectionnés sont en classe A</strong> — intention et fraîcheur suffisantes pour activation immédiate. Ces profils ont un historique de participation aux salons L'Étudiant et un profil complété.` },
+    { icon:'📍', text:`<strong>${topRegionName} concentre le plus grand nombre de leads dans la sélection</strong> (${topRegionCount} profils, score moyen ${topRegionScore}/100) — surpondération structurelle liée à la densité de salons et à la source SAL-Salon.` },
+    { icon:'🔁', text:`<strong>${ns} profils no-show dans la sélection</strong> (${pctNS}% des leads filtrés) — inscrits aux salons n'ayant pas été présents. Intention prouvée par l'inscription : segment prioritaire pour Product 2.` },
+    { icon:'📊', text:`<strong>${topLevel} : ${topLevelRate}% de taux no-show</strong> (${topLevelNS} absents sur ${topLevelTotal} dans la sélection) — le niveau le plus représenté dans les salons et dans les no-shows. Signal fort pour le rapport post-salon.` },
+    { icon:'💬', text:`<strong>Le chatbot orientation génère un signal comportemental exploitable</strong> — les sessions identifiées par id_Inscrit_site enrichissent le score d'intention directement. En production BigQuery, ce signal couvrira l'intégralité des ${(D.kpis.total_scores*0.4).toFixed(0)} conversations anonymes restantes.` },
   ];
   document.getElementById('insights-container').innerHTML = items.map(i=>`
     <div class="insight"><div class="insight-icon">${i.icon}</div><div>${i.text}</div></div>`).join('');
@@ -646,11 +598,11 @@ const GC = { grid:'rgba(226,221,213,0.8)', tick:'#b0ada8', font:'JetBrains Mono'
 function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
 
 function renderCharts() {
-  // A/B/C (from filtered)
+  // A/B/C — global when no filter active, computed from filtered subset otherwise
   destroyChart('abc');
-  const abcCounts = ['A','B','C'].map(c=>filtered.filter(l=>l.lead_class===c).length);
-  // If no filtered data, fall back to global
-  const abcData = abcCounts.some(v=>v>0) ? abcCounts : [D.kpis.classe_A, D.kpis.classe_B, D.kpis.classe_C];
+  const abcData = hasActiveFilter()
+    ? ['A','B','C'].map(c => filtered.filter(l=>l.lead_class===c).length)
+    : [D.kpis.classe_A, D.kpis.classe_B, D.kpis.classe_C];
   charts['abc'] = new Chart(document.getElementById('chart-abc'), {
     type:'bar',
     data:{ labels:['Classe A — Haute intention','Classe B — Intention modérée','Classe C — Faible intention'],
@@ -757,103 +709,6 @@ function renderTable() {
     </tr>`).join('');
   document.getElementById('leads-tbody').innerHTML = rows ||
     '<tr><td colspan="10" style="text-align:center;color:var(--ink-dimmer);padding:28px;">Aucun profil ne correspond aux filtres sélectionnés</td></tr>';
-}
-
-// ═══════════════════════════════════════════════════════
-// BUSINESS PLAN
-// ═══════════════════════════════════════════════════════
-
-function g(id){ return parseFloat(document.getElementById(id)?.value||0); }
-function fmtK(v){ return v>=1000?(v/1000).toFixed(0)+'K€':v.toFixed(0)+'€'; }
-
-function recalc(){
-  const p1Price=g('p1-price'), p1Leads=g('p1-leads'), p1C1=g('p1-c1');
-  const p1Growth=g('p1-growth')/100, p1Conv=g('p1-conv')/100, p1Churn=g('p1-churn')/100;
-  const p1C2=Math.round(p1C1*(1+p1Growth)*(1-p1Churn)), p1C3=Math.round(p1C2*(1+p1Growth*0.6)*(1-p1Churn));
-  const p1Y1=p1C1*p1Leads*12*p1Price, p1Y2=p1C2*p1Leads*12*p1Price, p1Y3=p1C3*p1Leads*12*p1Price;
-
-  const p2Price=g('p2-price'), p2Sal=g('p2-salons'), p2Adopt=g('p2-adopt')/100;
-  const p2Exp=g('p2-exp'), p2Growth=g('p2-growth')/100;
-  const p2Y1=p2Sal*p2Exp*p2Adopt*p2Price;
-  const p2Y2=p2Sal*p2Exp*Math.min(p2Adopt*(1+p2Growth),0.75)*p2Price;
-  const p2Y3=p2Sal*p2Exp*Math.min(p2Adopt*(1+p2Growth)*1.4,0.90)*p2Price;
-
-  const p3Mrr=g('p3-mrr'), p3C1=g('p3-c1'), p3Growth=g('p3-growth')/100;
-  const p3Exp=g('p3-exports'), p3Ppu=g('p3-ppu');
-  const p3C2=Math.round(p3C1*(1+p3Growth)), p3C3=Math.round(p3C2*(1+p3Growth*0.7));
-  const p3Y1=p3C1*(p3Mrr*12+p3Exp*12*p3Ppu), p3Y2=p3C2*(p3Mrr*12+p3Exp*12*p3Ppu), p3Y3=p3C3*(p3Mrr*12+p3Exp*12*p3Ppu);
-
-  const tY1=p1Y1+p2Y1+p3Y1, tY2=p1Y2+p2Y2+p3Y2, tY3=p1Y3+p2Y3+p3Y3;
-  const infra=g('infra'), team=g('team'), dpo=g('dpo'), salesPct=g('sales-pct')/100;
-  const cY1=infra+team+dpo+tY1*salesPct, cY2=infra+team*1.3+dpo+tY2*salesPct, cY3=infra*1.5+team*2+dpo+tY3*salesPct;
-  const eY1=tY1-cY1, eY2=tY2-cY2, eY3=tY3-cY3;
-
-  // Revenue table
-  document.getElementById('rev-table').innerHTML = `
-    <thead><tr><th>Ligne</th><th>Année 1</th><th>Année 2</th><th>Année 3</th><th>Hypothèse clé</th></tr></thead>
-    <tbody>
-      <tr><td>P1 — Lead Feed</td><td>${fmtK(p1Y1)}</td><td>${fmtK(p1Y2)}</td><td>${fmtK(p1Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${p1C1}→${p1C2}→${p1C3} clients · conv. ${(p1Conv*100).toFixed(0)}%</td></tr>
-      <tr><td>P2 — No-Show Report</td><td>${fmtK(p2Y1)}</td><td>${fmtK(p2Y2)}</td><td>${fmtK(p2Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${(p2Adopt*100).toFixed(0)}% adoption exposants</td></tr>
-      <tr><td>P3 — Life-moment API</td><td>${fmtK(p3Y1)}</td><td>${fmtK(p3Y2)}</td><td>${fmtK(p3Y3)}</td><td style="font-family:var(--font-mono);font-size:11px;">${p3C1}→${p3C2}→${p3C3} clients API</td></tr>
-      <tr><td>Coûts opérationnels</td><td style="color:var(--C);">-${fmtK(cY1)}</td><td style="color:var(--C);">-${fmtK(cY2)}</td><td style="color:var(--C);">-${fmtK(cY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">Infra+Équipe+DPO+Sales</td></tr>
-      <tr class="total"><td>CA Total</td><td>${fmtK(tY1)}</td><td>${fmtK(tY2)}</td><td>${fmtK(tY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">CAGR ${tY1>0?Math.round((Math.pow(tY3/Math.max(tY1,1),0.5)-1)*100):0}%</td></tr>
-      <tr class="total"><td>EBITDA estimé</td><td>${fmtK(eY1)}</td><td>${fmtK(eY2)}</td><td>${fmtK(eY3)}</td><td style="font-family:var(--font-mono);font-size:11px;">Marge nette Y3 : ${tY3>0?Math.round(eY3/tY3*100):0}%</td></tr>
-    </tbody>`;
-
-  // Revenue chart
-  if(revChart){revChart.destroy();}
-  revChart = new Chart(document.getElementById('chart-revenue'),{
-    type:'bar',
-    data:{ labels:['Année 1','Année 2','Année 3'],
-      datasets:[
-        {label:'P1 Lead Feed', data:[p1Y1,p1Y2,p1Y3], backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:4},
-        {label:'P2 No-Show', data:[p2Y1,p2Y2,p2Y3], backgroundColor:'rgba(26,95,200,0.6)', borderColor:'#1a5fc8', borderWidth:1, borderRadius:4},
-        {label:'P3 API', data:[p3Y1,p3Y2,p3Y3], backgroundColor:'rgba(26,122,60,0.6)', borderColor:'#1a7a3c', borderWidth:1, borderRadius:4},
-      ]},
-    options:{ responsive:true,
-      plugins:{legend:{position:'top',labels:{color:GC.tick,font:{family:GC.font,size:10},boxWidth:10,padding:10}}},
-      scales:{ x:{stacked:true,grid:{display:false},ticks:{color:GC.tick}}, y:{stacked:true,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>(v/1000).toFixed(0)+'K€'}} }}
-  });
-
-  // Sensitivity 1 — conversion rate
-  const convRates=[6,10,14,18,22,28];
-  const baseConv=g('p1-conv');
-  document.getElementById('sens1').innerHTML=
-    '<thead><tr><th>Conv. rate</th><th>CA Y1</th><th>CA Y2</th><th>EBITDA Y1</th></tr></thead><tbody>'+
-    convRates.map(cr=>{
-      const c=Math.round(p1C1*cr/Math.max(baseConv,1));
-      const rev=c*p1Leads*12*p1Price;
-      const revY2=Math.round(c*(1+p1Growth)*(1-p1Churn))*p1Leads*12*p1Price;
-      const eb=rev-cY1;
-      const isBase=Math.abs(cr-baseConv)<1;
-      const h=isBase?'hb':(eb<0?'hl':eb<30000?'hm':'hh');
-      return`<tr><td class="${isBase?'hb':''}">${cr}%</td><td class="${h}">${fmtK(rev)}</td><td class="${h}">${fmtK(revY2)}</td><td class="${isBase?'hb':(eb<0?'hl':eb<30000?'hm':'hh')}">${fmtK(eb)}</td></tr>`;
-    }).join('')+'</tbody>';
-
-  // Sensitivity 2 — price per lead
-  const prices=[0.60,0.80,1.00,1.20,1.50,2.00];
-  document.getElementById('sens2').innerHTML=
-    '<thead><tr><th>Prix/lead</th><th>CA Y1</th><th>CA Y2</th><th>Marge brute</th></tr></thead><tbody>'+
-    prices.map(pr=>{
-      const rev=p1C1*p1Leads*12*pr;
-      const revY2=p1C2*p1Leads*12*pr;
-      const marge=Math.round((rev-p1C1*p1Leads*12*0.08)/Math.max(rev,1)*100);
-      const isBase=Math.abs(pr-p1Price)<0.05;
-      const h=isBase?'hb':(marge<70?'hl':marge<80?'hm':'hh');
-      return`<tr><td class="${isBase?'hb':''}">${pr.toFixed(2)}€</td><td class="${h}">${fmtK(rev)}</td><td class="${h}">${fmtK(revY2)}</td><td class="${h}">${marge}%</td></tr>`;
-    }).join('')+'</tbody>';
-}
-
-// ═══════════════════════════════════════════════════════
-// VIEW SWITCHING
-// ═══════════════════════════════════════════════════════
-
-function switchView(name, btn) {
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('view-'+name).classList.add('active');
-  btn.classList.add('active');
-  if(name==='bizplan') setTimeout(recalc,100);
 }
 
 // INIT
