@@ -86,12 +86,25 @@ select.filter {
   transition:border-color 0.15s;
 }
 select.filter:focus { outline:none; border-color:var(--accent); }
+
+.filters-actions { margin-left:auto; display:flex; gap:8px; align-items:center; }
+
 .btn-reset {
-  margin-left:auto; background:none; border:1px solid var(--border);
+  background:none; border:1px solid var(--border);
   color:var(--ink-dim); font-family:var(--font-mono); font-size:10px;
   padding:5px 12px; border-radius:5px; cursor:pointer; transition:all 0.15s;
 }
 .btn-reset:hover { border-color:var(--accent); color:var(--accent); }
+
+.btn-export {
+  background:var(--accent); border:none;
+  color:#fff; font-family:var(--font-mono); font-size:10px; font-weight:500;
+  padding:5px 14px; border-radius:5px; cursor:pointer;
+  transition:all 0.15s; display:flex; align-items:center; gap:5px;
+}
+.btn-export:hover { background:#a82d14; }
+.btn-export:disabled { background:var(--border2); color:var(--ink-dimmer); cursor:not-allowed; }
+.btn-export svg { width:11px; height:11px; flex-shrink:0; }
 
 /* KPIs */
 .kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:14px; margin-bottom:24px; }
@@ -143,9 +156,26 @@ table.dt tr:hover td { background:var(--surface2); }
 .badge-B { background:#fef9c3; color:var(--B); }
 .badge-C { background:#fee2e2; color:var(--C); }
 .badge-ns { background:#fee2e2; color:var(--C); }
-.badge-ori { background:#eff6ff; color:var(--accent2); }
+
+/* TABLE META */
+.table-meta {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px; flex-wrap:wrap; gap:8px;
+}
+.table-count { font-family:var(--font-mono); font-size:11px; color:var(--ink-dim); }
+.table-count strong { color:var(--ink); }
 
 .source-note { font-family:var(--font-mono); font-size:10px; color:var(--ink-dimmer); margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
+
+/* EXPORT FEEDBACK */
+.export-feedback {
+  display:none; align-items:center; gap:6px;
+  font-family:var(--font-mono); font-size:10px; color:var(--A);
+  background:#dcfce7; border:1px solid #bbf7d0;
+  border-radius:5px; padding:4px 10px;
+  animation:fadeIn 0.2s ease;
+}
+.export-feedback.visible { display:flex; }
 </style>
 </head>
 <body>
@@ -158,9 +188,6 @@ table.dt tr:hover td { background:var(--surface2); }
   <div class="header-status"><div class="dot"></div><span id="status-text">Chargement…</span></div>
 </header>
 
-<!-- ═══════════════════════════════════════════
-     BAROMETRE
-═══════════════════════════════════════════ -->
 <div id="view-barometer" class="view active">
   <div class="section-header">
     <div class="section-title">Baromètre <em>Orientation</em></div>
@@ -174,7 +201,17 @@ table.dt tr:hover td { background:var(--surface2); }
     <select class="filter" id="f-level" onchange="applyFilters()"><option value="">Tous niveaux</option></select>
     <select class="filter" id="f-recency" onchange="applyFilters()"><option value="">Toute période</option><option>0-7d</option><option>8-30d</option><option>31-90d</option><option>91-365d</option><option>365d+</option></select>
     <select class="filter" id="f-noshow" onchange="applyFilters()"><option value="">Tous profils</option><option value="true">No-shows uniquement</option><option value="false">Présents uniquement</option></select>
-    <button class="btn-reset" onclick="resetFilters()">↺ Réinitialiser</button>
+    <div class="filters-actions">
+      <span class="export-feedback" id="export-feedback">
+        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 6.5l2.5 2.5L10 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Fichier téléchargé
+      </span>
+      <button class="btn-export" id="btn-export" onclick="exportCSV()">
+        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3.5 5.5L6 8l2.5-2.5M2 10.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export CSV
+      </button>
+      <button class="btn-reset" onclick="resetFilters()">↺ Réinitialiser</button>
+    </div>
   </div>
 
   <div class="kpi-grid" id="kpi-grid"></div>
@@ -227,6 +264,13 @@ table.dt tr:hover td { background:var(--surface2); }
   <div class="card" style="margin-top:16px;">
     <div class="card-title">Top leads activables</div>
     <div class="card-desc">Profils conformes RGPD · triés par score composite · données BigQuery réelles</div>
+    <div class="table-meta">
+      <span class="table-count" id="table-count"></span>
+      <button class="btn-export" id="btn-export-table" onclick="exportCSV()" style="font-size:10px;">
+        <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 1v7M3.5 5.5L6 8l2.5-2.5M2 10.5h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Exporter la sélection (<span id="export-count">0</span> profils)
+      </button>
+    </div>
     <div class="table-wrap">
       <table class="dt">
         <thead><tr>
@@ -242,202 +286,10 @@ table.dt tr:hover td { background:var(--surface2); }
   <div class="source-note" id="source-note"></div>
 </div>
 
-<!-- removed: Fiches Produit, Business Plan, Build vs Partner
-<div id="view-specs" class="view">
-  <div class="section-header">
-    <div class="section-title">Fiches <em>Produit</em></div>
-    <div class="section-sub">Spécifications formelles · client · inputs · transformations · pricing · marge</div>
-  </div>
-  <div class="spec-grid">
-
-    <div class="spec-card">
-      <div class="spec-head">
-        <div class="spec-num">Produit 01</div>
-        <div class="spec-name">High-Intent Lead Feed</div>
-        <div class="spec-tag">Du profil statique au rang dynamique d'opportunité</div>
-      </div>
-      <div class="spec-body">
-        <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Grandes écoles, universités, bootcamps · équipes recrutement avec budget CPA défini</div></div>
-        <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">Listes statiques : un profil vu hier = un profil vu il y a 6 mois, même prix. Le client paie pour des leads froids.</div></div>
-        <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Flux hebdomadaire des top 200 prospects recalculé en temps réel depuis les comportements récents. Le produit est le <em>rang</em>, pas le profil.</div></div>
-        <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val"><ul><li>Salons_Inscrits_et_venus · inscriptions + présence</li><li>Agent_Conversationnel_ORI · sessions chatbot</li><li>Site_Inscrits · optins + géographie</li><li>CRM_Communication · engagement email</li></ul></div></div>
-        <div class="spec-row"><div class="spec-key">Transformations</div><div class="spec-val"><ul><li>Score fraîcheur : exp decay λ=0.015 depuis last_interaction</li><li>Score intention : signaux pondérés tanh-normalisés</li><li>Score complétude : champs commercialement utilisables</li><li>Compliance : optin=True + non-mineur + ACTIF</li></ul></div></div>
-        <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">0,80 € – 2,00 € / lead scoré</div><div style="font-size:11px;color:var(--ink-dim);margin-top:5px;">vs. 0,30–0,60 € liste brute → <strong>×3 revenu/lead potentiel</strong></div></div></div>
-        <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:85%"></div></div><div class="mbar-label">85% · coût marginal ~0,08€/lead · infra pipeline mutualisée</div></div></div>
-      </div>
-    </div>
-
-    <div class="spec-card">
-      <div class="spec-head">
-        <div class="spec-num">Produit 02</div>
-        <div class="spec-name">No-Show Intelligence Report</div>
-        <div class="spec-tag">Transformer le coût irrécupérable en opportunité de réactivation</div>
-      </div>
-      <div class="spec-body">
-        <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Exposants des salons L'Étudiant · responsables recrutement · marketing événementiel</div></div>
-        <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">38–42% des inscrits ne viennent pas aux salons (données réelles BigQuery). Cette donnée disparaît. Ce sont des leads chauds non convertis.</div></div>
-        <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Rapport post-salon livré sous 48h : qui n'est pas venu, quels profils sont sur-représentés, quels signaux de friction, quels profils restent ré-engageables.</div></div>
-        <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val"><ul><li>Salons_Inscrits_et_venus · Showed_up=false</li><li>Site_Inscrits · optin, région, acquisition_source</li><li>CRM_Communication · engagement email pré-salon</li></ul></div></div>
-        <div class="spec-row"><div class="spec-key">Transformations</div><div class="spec-val"><ul><li>Filtre no-show : Showed_up IS NULL AND salon_date IS NOT NULL</li><li>Segmentation : study_level, study_field_interests</li><li>Score ré-engagement : email opened + chatbot pré-salon</li></ul></div></div>
-        <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">3 000 € – 8 000 € / édition salon</div><div style="font-size:11px;color:var(--ink-dim);margin-top:5px;">Add-on post-salon · ~10 salons/an → <strong>30k–80k€ ARR potentiel</strong></div></div></div>
-        <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:93%"></div></div><div class="mbar-label">93% · pipeline automatisé · coût = compute + QA</div></div></div>
-      </div>
-    </div>
-
-    <div class="spec-card" style="grid-column:1/-1;">
-      <div class="spec-head">
-        <div class="spec-num">Produit 03</div>
-        <div class="spec-name">Life-moment Audience API</div>
-        <div class="spec-tag">Self-service segmentation pour partenaires financiers, logement et mobilité</div>
-      </div>
-      <div class="spec-body" style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
-        <div>
-          <div class="spec-row"><div class="spec-key">Client cible</div><div class="spec-val">Banques (Boursorama, Hello Bank), plateformes logement (Studapart), assureurs, mobilité internationale</div></div>
-          <div class="spec-row"><div class="spec-key">Problème</div><div class="spec-val">Workflow actuel : appel commercial → négociation → extraction manuelle. Lent, non scalable, pas d'audit trail RGPD.</div></div>
-          <div class="spec-row"><div class="spec-key">Description</div><div class="spec-val">Endpoint API REST self-service permettant de requêter des segments par life-moment avec audit trail de consentement intégré.</div></div>
-        </div>
-        <div>
-          <div class="spec-row"><div class="spec-key">Inputs BigQuery</div><div class="spec-val">Site_Inscrits (optin_FINANCE, optin_HOUSING) · comportements cross-tables · consentements granulaires</div></div>
-          <div class="spec-row"><div class="spec-key">Pricing</div><div class="spec-val"><div class="price-pill">500–2 000 €/mois accès plateforme</div><div style="margin-top:5px;"><span class="price-pill" style="font-size:11px;">+ 0,50–1,20 € / profil exporté</span></div></div></div>
-          <div class="spec-row"><div class="spec-key">Marge brute</div><div class="spec-val"><div class="mbar"><div class="mbar-fill" style="width:78%"></div></div><div class="mbar-label">78% · coût infra API + DPO + maintenance</div></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="compliance-box">
-    <div class="compliance-title">Note de conformité RGPD · pipeline by design</div>
-    <p style="font-size:12px;color:var(--ink-dim);">Aucun profil n'atteint l'état "activable" sans passer ces contrôles. Vérifiés à chaque run du pipeline.</p>
-    <div class="compliance-grid">
-      <div class="compliance-item"><span class="check">✓</span><span>optin_commercial_actuel = True · consentement explicite requis</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Majorité vérifiée sur Naissance_Date · exclusion mineurs</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>ACTIF = Toujours inscrit · profils désinscrits exclus</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Aucun champ PII (email, téléphone, nom) dans les outputs d'activation — uniquement id_Inscrit_site pseudonymisé</span></div>
-      <div class="compliance-item"><span class="check">✓</span><span>Droit à l'oubli : la clé id_Inscrit_site permet la suppression propagée sur tous les outputs du pipeline</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     BUSINESS PLAN
-═══════════════════════════════════════════ -->
-<div id="view-bizplan" class="view">
-  <div class="section-header" style="display:flex;align-items:flex-end;justify-content:space-between;">
-    <div>
-      <div class="section-title">Business <em>Plan</em></div>
-      <div class="section-sub">Projections 3 ans · hypothèses nommées · sensibilité sur 2 variables critiques · modèle interactif</div>
-    </div>
-    <button class="recalc-btn" onclick="recalc()">↺ Recalculer</button>
-  </div>
-  <div class="bp-grid">
-    <div class="assumption-card">
-      <div class="assum-title">P1 — Lead Feed</div>
-      <div class="assum-row"><span class="assum-name">Prix moyen / lead (€)</span><input class="assum-input" id="p1-price" type="number" value="1.20" step="0.10" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Leads / client / mois</span><input class="assum-input" id="p1-leads" type="number" value="200" step="10" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Clients Y1</span><input class="assum-input" id="p1-c1" type="number" value="8" step="1" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Croissance clients Y2/Y3 (%)</span><input class="assum-input" id="p1-growth" type="number" value="80" step="5" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Taux conversion prospect→client (%)</span><input class="assum-input" id="p1-conv" type="number" value="18" step="1" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Churn annuel (%)</span><input class="assum-input" id="p1-churn" type="number" value="15" step="1" onchange="recalc()"></div>
-    </div>
-    <div class="assumption-card">
-      <div class="assum-title">P2 — No-Show Report</div>
-      <div class="assum-row"><span class="assum-name">Prix moyen / rapport (€)</span><input class="assum-input" id="p2-price" type="number" value="5000" step="500" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Salons / an</span><input class="assum-input" id="p2-salons" type="number" value="10" step="1" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Taux adoption exposants Y1 (%)</span><input class="assum-input" id="p2-adopt" type="number" value="25" step="5" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Exposants moyens / salon</span><input class="assum-input" id="p2-exp" type="number" value="30" step="5" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Croissance adoption Y2/Y3 (%)</span><input class="assum-input" id="p2-growth" type="number" value="60" step="5" onchange="recalc()"></div>
-    </div>
-    <div class="assumption-card">
-      <div class="assum-title">P3 — Life-moment API</div>
-      <div class="assum-row"><span class="assum-name">MRR / client (€/mois)</span><input class="assum-input" id="p3-mrr" type="number" value="1200" step="100" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Clients API Y1</span><input class="assum-input" id="p3-c1" type="number" value="3" step="1" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Croissance clients Y2/Y3 (%)</span><input class="assum-input" id="p3-growth" type="number" value="100" step="10" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Profils exportés / client / mois</span><input class="assum-input" id="p3-exports" type="number" value="500" step="100" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Prix / profil exporté (€)</span><input class="assum-input" id="p3-ppu" type="number" value="0.80" step="0.10" onchange="recalc()"></div>
-    </div>
-    <div class="assumption-card">
-      <div class="assum-title">Coûts & structure</div>
-      <div class="assum-row"><span class="assum-name">Infra BigQuery + pipeline (€/an)</span><input class="assum-input" id="infra" type="number" value="18000" step="1000" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Équipe data (€/an)</span><input class="assum-input" id="team" type="number" value="60000" step="5000" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">DPO / conformité (€/an)</span><input class="assum-input" id="dpo" type="number" value="12000" step="1000" onchange="recalc()"></div>
-      <div class="assum-row"><span class="assum-name">Sales & marketing (% CA)</span><input class="assum-input" id="sales-pct" type="number" value="12" step="1" onchange="recalc()"></div>
-    </div>
-  </div>
-  <div class="rev-table-wrap"><table class="rev" id="rev-table"></table></div>
-  <div class="card"><div class="card-title">Projection revenus 3 ans par produit</div><div class="card-desc">Modèle recalculé dynamiquement · modifier les hypothèses ci-dessus</div><canvas id="chart-revenue" height="180"></canvas></div>
-  <div class="sens-grid">
-    <div class="card"><div class="card-title">Sensibilité · Taux conversion P1 (%)</div><p style="font-size:11px;color:var(--ink-dimmer);margin-bottom:14px;">Variable la plus incertaine : pas de référence interne sur la conversion B2B de L'Étudiant sur ce segment.</p><table class="sens" id="sens1"></table></div>
-    <div class="card"><div class="card-title">Sensibilité · Prix moyen / lead (€)</div><p style="font-size:11px;color:var(--ink-dimmer);margin-bottom:14px;">Élasticité prix inconnue. Marché actuel : 0,30–0,60€. La valeur perçue de l'intelligence vs. le volume reste à valider.</p><table class="sens" id="sens2"></table></div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════
-     BUILD VS PARTNER
-═══════════════════════════════════════════ -->
-<div id="view-bvp" class="view">
-  <div class="section-header">
-    <div class="section-title">Build <em>vs</em> Partner</div>
-    <div class="section-sub">Framework de décision · Lead Scoring Model · logique argumentée</div>
-  </div>
-  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--ink-dim);">
-    <strong style="color:var(--ink);">Question L'Étudiant :</strong> Pour le lead scoring model, faut-il construire en interne ou s'appuyer sur un partenaire d'enrichissement (Cognism, Clearbit, Lusha…) — et quelle est la logique de décision ?
-  </div>
-  <div class="bvp-grid">
-    <div class="bvp-card">
-      <div class="bvp-label">Option A</div>
-      <div class="bvp-title">Build In-house</div>
-      <div class="bvp-item"><span class="pro">+</span><span>Données comportementales letudiant.fr exclusives : non disponibles chez des tiers</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Contrôle total du modèle : adaptation aux cycles saisonniers (rentrée, Parcoursup, salons)</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Conformité RGPD native : données dans le périmètre légal de L'Étudiant</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Pas de coût de licence tiers : marge 85–93% préservée</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Actif stratégique : le modèle devient une barrière à l'entrée long terme</span></div>
-      <div class="bvp-item"><span class="con">−</span><span>Nécessite une compétence data science interne ou une embauche</span></div>
-      <div class="bvp-item"><span class="con">−</span><span>Time-to-market plus long : 3–6 mois pour un modèle ML en production</span></div>
-    </div>
-    <div class="bvp-card rec">
-      <div class="bvp-label rec">★ Recommandée · Option B</div>
-      <div class="bvp-title">Hybride (Build core + Partner enrichissement)</div>
-      <div class="bvp-item"><span class="pro">+</span><span>Modèle core in-house sur données propriétaires · différenciateur préservé</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Enrichissement géographique INSEE open data (gratuit, sans DPA complexe) pour les 3% sans région</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Partenaire commercial (Cognism, Clearbit) uniquement si Life-moment API lancée et clients B2B demandent signaux cross-domain</span></div>
-      <div class="bvp-item"><span class="pro">+</span><span>Couplage lâche : remplacement du partenaire facilité, pas de lock-in</span></div>
-      <div class="bvp-item"><span class="con">−</span><span>Coût de licence si partenaire commercial : 500–3 000 €/mois selon volume</span></div>
-      <div class="bvp-item"><span class="con">−</span><span>DPA requis avec tout tiers : due diligence RGPD à prévoir</span></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Framework de décision par critère</div>
-    <div class="card-desc">Logique appliquée critère par critère</div>
-    <table class="df-table">
-      <thead><tr><th>Critère</th><th>Décision</th><th>Raisonnement</th></tr></thead>
-      <tbody>
-        <tr><td>Unicité des données comportementales</td><td><span class="verdict v-build">BUILD</span></td><td>Signaux chatbot, simulateur, salons sur letudiant.fr exclusifs. Cœur différenciateur non reproductible par un tiers.</td></tr>
-        <tr><td>Signaux complémentaires (géo, socio)</td><td><span class="verdict v-partner">PARTNER</span></td><td>Région NULL sur ~3% des profils (97% couverts grâce à la jointure BigQuery). INSEE open data suffit pour combler sans DPA complexe.</td></tr>
-        <tr><td>Logique de scoring composite</td><td><span class="verdict v-build">BUILD</span></td><td>Modèle fraîcheur/intention/complétude codé, testé, documenté. Le reconstruire chez un tiers serait régressif.</td></tr>
-        <tr><td>Time-to-market initial</td><td><span class="verdict v-build">BUILD</span></td><td>Pipeline opérationnel aujourd'hui. Pas besoin de tiers pour le MVP et le pilote commercial.</td></tr>
-        <tr><td>Conformité RGPD</td><td><span class="verdict v-build">BUILD</span></td><td>Toute intégration tiers nécessite un DPIA. Pour le MVP, rester dans le périmètre BigQuery de L'Étudiant est la voie la plus simple.</td></tr>
-        <tr><td>Scalabilité long terme (Y2+)</td><td><span class="verdict v-hybrid">HYBRIDE</span></td><td>BigQuery ML ou Vertex AI pour le modèle core. Partenaire commercial optionnel si Life-moment API décollage et clients B2B demandent des signaux externes.</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:3px solid var(--A);border-radius:var(--radius);padding:18px 22px;margin-top:16px;">
-    <div style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--A);margin-bottom:10px;">Recommandation finale</div>
-    <p style="font-size:13px;line-height:1.7;color:var(--ink);">
-      <strong>Architecture hybride en deux temps :</strong> (1) Lancer avec le pipeline in-house actuel sur BigQuery — c'est suffisant pour le MVP et le pilote. (2) À partir de la production, évaluer un enrichissement géographique INSEE (gratuit) pour les profils sans région. Les fournisseurs commerciaux ne sont pertinents qu'en Y2 si des clients Life-moment API demandent explicitement des signaux cross-domain — décision à revoir à ce moment-là.
-    </p>
-  </div>
-  <div class="source-note">Sources : schéma BigQuery letudiant-data-prod.Hacka_g21 · analyse taux complétude profiles_joined.csv · benchmarks fournisseurs enrichissement data France 2025–2026</div>
-</div>
--->
-
 <script>
-// ═══════════════════════════════════════════════════════
-// DATA LOADING
-// ═══════════════════════════════════════════════════════
-
-let D = null;        // full barometer_data.json
-let leads = [];      // top_leads array
-let filtered = [];   // post-filter leads
+let D = null;
+let leads = [];
+let filtered = [];
 let charts = {};
 
 async function init() {
@@ -469,9 +321,7 @@ function populateFilters() {
   (fo.levels || []).forEach(l => { if(!l) return; const o=document.createElement('option'); o.value=l; o.textContent=l; levelSel.appendChild(o); });
 }
 
-// ═══════════════════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════════════════
+// ── FILTERS ──────────────────────────────────────────
 
 function hasActiveFilter() {
   return ['f-class','f-region','f-level','f-recency','f-noshow']
@@ -479,11 +329,11 @@ function hasActiveFilter() {
 }
 
 function applyFilters() {
-  const fc    = document.getElementById('f-class').value;
-  const fr    = document.getElementById('f-region').value;
-  const fl    = document.getElementById('f-level').value;
-  const frec  = document.getElementById('f-recency').value;
-  const fns   = document.getElementById('f-noshow').value;
+  const fc   = document.getElementById('f-class').value;
+  const fr   = document.getElementById('f-region').value;
+  const fl   = document.getElementById('f-level').value;
+  const frec = document.getElementById('f-recency').value;
+  const fns  = document.getElementById('f-noshow').value;
 
   filtered = leads.filter(l => {
     if (fc   && l.lead_class     !== fc)   return false;
@@ -506,9 +356,49 @@ function resetFilters() {
   applyFilters();
 }
 
-// ═══════════════════════════════════════════════════════
-// KPIs (uses global D for totals, filtered for subset)
-// ═══════════════════════════════════════════════════════
+// ── CSV EXPORT ────────────────────────────────────────
+
+function exportCSV() {
+  if (!filtered.length) return;
+
+  const cols = [
+    'id_Inscrit_site','lead_class','composite_score',
+    'score_freshness','score_intent','score_completeness',
+    'Region','level_label','recency_bucket','no_show','life_moment'
+  ];
+
+  const header = cols.join(',');
+  const rows = filtered.map(l =>
+    cols.map(c => {
+      const val = l[c] ?? '';
+      const s = String(val);
+      return s.includes(',') || s.includes('"') || s.includes('\n')
+        ? `"${s.replace(/"/g, '""')}"` : s;
+    }).join(',')
+  );
+
+  const csv  = [header, ...rows].join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const date = new Date().toISOString().slice(0, 10);
+  const cls  = document.getElementById('f-class').value;
+  const reg  = document.getElementById('f-region').value;
+  const suffix = [cls, reg].filter(Boolean).join('_') || 'all';
+  a.href     = url;
+  a.download = `leads_etudiant_${suffix}_${date}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  // Feedback flash
+  const fb = document.getElementById('export-feedback');
+  fb.classList.add('visible');
+  setTimeout(() => fb.classList.remove('visible'), 2500);
+}
+
+// ── KPIs ──────────────────────────────────────────────
 
 function renderKPIs() {
   const kpi    = D.kpis;
@@ -537,9 +427,7 @@ function renderKPIs() {
     </div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// INSIGHTS
-// ═══════════════════════════════════════════════════════
+// ── INSIGHTS ──────────────────────────────────────────
 
 function renderInsights() {
   const total = filtered.length || 1;
@@ -548,7 +436,6 @@ function renderInsights() {
   const pctA  = Math.round(A  / total * 100);
   const pctNS = Math.round(ns / total * 100);
 
-  // Top region from filtered leads
   const regionCount = {}, regionScore = {};
   filtered.forEach(l => {
     if (!l.Region || l.Region === '—') return;
@@ -562,7 +449,6 @@ function renderInsights() {
     ? (regionScore[topRegionName] / topRegionCount).toFixed(1)
     : ((D.region_scores[0]||{}).score_moyen||'');
 
-  // No-show rate by level from filtered leads
   const lvTotal = {}, lvNS = {};
   filtered.forEach(l => {
     const lv = l.level_label;
@@ -589,15 +475,11 @@ function renderInsights() {
     <div class="insight"><div class="insight-icon">${i.icon}</div><div>${i.text}</div></div>`).join('');
 }
 
-// ═══════════════════════════════════════════════════════
-// CHARTS
-// ═══════════════════════════════════════════════════════
+// ── CHARTS ────────────────────────────────────────────
 
 const GC = { grid:'rgba(226,221,213,0.8)', tick:'#b0ada8', font:'JetBrains Mono' };
 
 function destroyChart(id) { if(charts[id]){charts[id].destroy();delete charts[id];} }
-
-// ── Helpers : compute chart data from filtered leads or fall back to global D ──
 
 function getLifeMoments() {
   if (!hasActiveFilter()) return D.life_moments;
@@ -645,7 +527,6 @@ function getNoShowByLevel() {
 }
 
 function renderCharts() {
-  // A/B/C — global when no filter active, computed from filtered subset otherwise
   destroyChart('abc');
   const abcData = hasActiveFilter()
     ? ['A','B','C'].map(c => filtered.filter(l=>l.lead_class===c).length)
@@ -658,7 +539,6 @@ function renderCharts() {
       scales:{ x:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, y:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
   });
 
-  // Life-moments — filter-aware
   destroyChart('lifemoment');
   const lm = getLifeMoments();
   charts['lifemoment'] = new Chart(document.getElementById('chart-lifemoment'), {
@@ -669,7 +549,6 @@ function renderCharts() {
     options:{ cutout:'62%', responsive:true, plugins:{legend:{position:'bottom',labels:{color:GC.tick,font:{family:GC.font,size:10},padding:10,boxWidth:10}}} }
   });
 
-  // Régions — filter-aware
   destroyChart('region');
   const reg = getRegionScores();
   charts['region'] = new Chart(document.getElementById('chart-region'), {
@@ -680,7 +559,6 @@ function renderCharts() {
       scales:{ y:{min:0,max:100,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:40}} }}
   });
 
-  // Recency — filter-aware
   destroyChart('recency');
   const recKeys = ['0-7d','8-30d','31-90d','91-365d','365d+'];
   const rec = getRecencyBuckets();
@@ -694,7 +572,6 @@ function renderCharts() {
       scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10}}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10}}} }}
   });
 
-  // No-shows par niveau — filter-aware
   destroyChart('noshows');
   const ns = getNoShowByLevel();
   charts['noshows'] = new Chart(document.getElementById('chart-noshows'), {
@@ -705,21 +582,16 @@ function renderCharts() {
       scales:{ y:{min:0,max:100,grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:9},maxRotation:35}} }}
   });
 
-  // CRM
   destroyChart('crm');
   const crm = D.crm_campaigns || [];
   charts['crm'] = new Chart(document.getElementById('chart-crm'), {
     type:'bar',
     data:{ labels:crm.map(c=>c.name),
-      datasets:[
-        {label:'Taux de clic %', data:crm.map(c=>c.click_rate), backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:4},
-      ]},
-    options:{ responsive:true,
-      plugins:{legend:{display:false}},
+      datasets:[{label:'Taux de clic %', data:crm.map(c=>c.click_rate), backgroundColor:'rgba(200,56,26,0.7)', borderColor:'#c8381a', borderWidth:1, borderRadius:4}]},
+    options:{ responsive:true, plugins:{legend:{display:false}},
       scales:{ y:{grid:{color:GC.grid},ticks:{color:GC.tick,font:{family:GC.font,size:10},callback:v=>v+'%'}}, x:{grid:{display:false},ticks:{color:GC.tick,font:{family:GC.font,size:10},maxRotation:30}} }}
   });
 
-  // Chatbot hebdo
   destroyChart('chatbot');
   const cw = D.chatbot_weekly;
   charts['chatbot'] = new Chart(document.getElementById('chart-chatbot'), {
@@ -735,11 +607,14 @@ function renderCharts() {
   });
 }
 
-// ═══════════════════════════════════════════════════════
-// TABLE
-// ═══════════════════════════════════════════════════════
+// ── TABLE ─────────────────────────────────────────────
 
 function renderTable() {
+  const count = filtered.length;
+  document.getElementById('table-count').innerHTML =
+    `<strong>${count.toLocaleString('fr-FR')}</strong> profil${count > 1 ? 's' : ''} · affichage des 20 premiers`;
+  document.getElementById('export-count').textContent = count.toLocaleString('fr-FR');
+
   const rows = filtered.slice(0,20).map(l=>`
     <tr>
       <td style="font-family:var(--font-mono);font-size:11px;">${l.id_Inscrit_site}</td>
@@ -757,7 +632,6 @@ function renderTable() {
     '<tr><td colspan="10" style="text-align:center;color:var(--ink-dimmer);padding:28px;">Aucun profil ne correspond aux filtres sélectionnés</td></tr>';
 }
 
-// INIT
 document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
